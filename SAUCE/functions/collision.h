@@ -381,7 +381,7 @@ char bg_coll_U_D_checks() {
 	switch (collision) {
 		case COL_NO_SIDE:
 			tmp8++;
-			return 1;
+			return 1;		
 		case COL_ALL: 
 			if (high_byte(currplayer_x) < 0x10 || was_on_slope_counter) return 0;
 			else return 1;
@@ -443,7 +443,7 @@ char bg_coll_slope() {
 	switch (collision) {
 		case COL_NO_SIDE:
 			return 1;
-
+			
 		// 45 degrees
 
 		case COL_ALL:
@@ -672,7 +672,7 @@ char bg_coll_return_slope_D () {
 			tmp8 = 0;
 		}
 	}
-	last_slope_type = slope_type;
+	last_slope_type = slope_type;	
 	eject_D = tmp8;
 	return tmp1;
 }
@@ -691,7 +691,7 @@ char bg_coll_return_slope_U () {
 			tmp8 = 0;
 		}
 	}
-	last_slope_type = slope_type;
+	last_slope_type = slope_type;	
 	eject_U = -tmp8;
 	return tmp1;
 }

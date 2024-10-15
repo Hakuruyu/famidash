@@ -66,8 +66,6 @@ void ship_movement(void){
 }
 
 void ufo_ship_eject() {
-	
-
 	if(bg_coll_U()){ // check collision above
 		high_byte(currplayer_y) = high_byte(currplayer_y) - eject_U;
 		currplayer_vel_y = 0;
@@ -76,7 +74,6 @@ void ufo_ship_eject() {
 		high_byte(currplayer_y) = high_byte(currplayer_y) - eject_D;
 		currplayer_vel_y = 0;
 	}
-	
 }	
 
 CODE_BANK_POP()
