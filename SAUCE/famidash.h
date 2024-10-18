@@ -282,7 +282,7 @@ uint8_t kandotemp;
 uint8_t kandotemp2[2];
 uint8_t kandotemp3;
 uint8_t kandotemp4;
-uint8_t kandotemp5;
+//uint8_t kandotemp5;
 uint8_t kandoframecnt;
 // NOTE: joypad2 in memory is before joypad1 due to ram saving reasons
 // so controllingplayer = 0 is player 2, and controllingplayer = 1 is player 1
