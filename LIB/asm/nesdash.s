@@ -1811,7 +1811,7 @@ music_counts:
 
 .segment "CODE_2"
 
-.import _disable_dpcm_bankswitch
+;.import _disable_dpcm_bankswitch
 .proc famistudio_dpcm_bank_callback
 	; ldx _disable_dpcm_bankswitch
 	; beq :+
