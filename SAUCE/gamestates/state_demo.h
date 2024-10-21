@@ -125,6 +125,8 @@ void state_demo(){
 //	#ifdef FLAG_BETA_BUILD
 		one_vram_buffer(0x18, NTADR_A(27,27)); // dot
 		one_vram_buffer(FLAG_MIN_VER, NTADR_A(28,27));
+		one_vram_buffer(0x18, NTADR_A(29,27)); // dot
+		one_vram_buffer(FLAG_REV_VER, NTADR_A(30,27));
 //	#endif
 	
 	// __asm__("LDA mmc3PRG1Bank \nPHA ");
