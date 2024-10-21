@@ -289,7 +289,7 @@ const short mini_heights[] = {
 	0x4D0,  0x4D0,  0x410,  0x3D0,  0x4D0,  0x4D0,  0x000, 0x000, // yellow orb
 	0x5B0,  0x500,  0x460,  0x3A0,  0x5B0,  0x500,  0x000, 0x000, // yellow pad
 	0x350,  0x4D0,  0x500,  0x4D0,  0x350,  0x4D0,  0x000, 0x000, // pink orb
-	0x350,  0x4A0,  0x4A0,  0x500,  0x350,  0x4A0,  0x000, 0x000, // pink pad
+	0x350,  0x3A0,  0x390,  0x300,  0x350,  0x3A0,  0x000, 0x000, // pink pad
 	0x850,  0x700,  0x600,  0x850,  0x850,  0x500,  0x000, 0x000, // red orb
 	0x590,  0x590,  0x560,  0x590,  0x590,  0x590,  0x000, 0x000, // yellow orb bigger
 	-0x990,-0x990, -0x970, -0x990, -0x990, -0x990,  0x000, 0x000, // black orb
@@ -479,7 +479,7 @@ void sprite_collide_lookup() {
 			settrailstuff();
 			
 		case BALL_MODE:
-			target_scroll_y = uint16SepArrLoad(activesprites_y, index) - 0x10; //unused now
+			target_scroll_y = (uint16SepArrLoad(activesprites_y, index) - 0x10);
 	//		target_scroll_y -= 0x10;
 		case ROBOT_MODE:
 			if (gamemode == 6) currplayer_vel_y = 0;
@@ -503,19 +503,22 @@ void sprite_collide_lookup() {
 		case SPIDER_MODE:
 			if (gamemode == 6) currplayer_vel_y = 0;
 			gamemode = 5;
-			retrofireballclear();			
+			retrofireballclear();		
+			target_scroll_y = (uint16SepArrLoad(activesprites_y, index) - 0x10);		
 			return;
 		case WAVE_MODE:
 			settrailstuff();
 			if (gamemode == 6) currplayer_vel_y = 0;			
 			gamemode = 6;
-			retrofireballclear();			
+			retrofireballclear();		
+			target_scroll_y = (uint16SepArrLoad(activesprites_y, index) - 0x10);		
 			return;
 		case SWING_MODE:
 			settrailstuff();
 			if (gamemode == 6) currplayer_vel_y = 0;
 			gamemode = 7;
-			retrofireballclear();			
+			retrofireballclear();		
+			target_scroll_y = (uint16SepArrLoad(activesprites_y, index) - 0x10);	
 			return;
 #ifdef FLAG_KANDO_FUN_STUFF
 		case NINJA_MODE:
