@@ -27,6 +27,8 @@
 -Credits must be viewed on a new save
 -Lock icon cursor position moved to side (overscan fix)
 -Customize screen CHR fixes
+-Music test/all menu screens loop music
+-Music test re-organized
 -Title screen demo improvements
 -Improve 3D cube by RedGD
 -Attributes fixed in nag screen
