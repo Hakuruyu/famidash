@@ -26,6 +26,7 @@ const uint8_t difficulty_pal_B[] ={
 void refreshmenu();
 void refreshmenu_part2();
 void code_checker();
+void check_if_music_stopped();
 void set_fun_settings();
 void checkcointimer(){
 	if (tmp1 == 1){
@@ -154,7 +155,6 @@ void state_lvldone() {
 	tmp6 = 0xf000; // real y 
 
 	//	one_vram_buffer(0xD0+coins, NTADR_A(12,9));
-	ppu_wait_nmi();
 
 	
     set_scroll_y(0xe8);
@@ -405,7 +405,9 @@ void state_lvldone() {
 
 
 
+CODE_BANK_PUSH("XCD_BANK_05")
 
+const unsigned char bgmtestscreen[];
 
 #include "defines/bgm_charmap.h"
 const unsigned char TEXT_xlevel1text1[]="STEREO$";
@@ -464,50 +466,69 @@ const unsigned char sfxtexts_size[] = {
 
 
 const unsigned char* const xbgmtexts1[] = {
-	0, 0, 0, 0, 0, 0, 0, TEXT_xlevel1textD, TEXT_xlevel1text1, TEXT_xlevel1text2, TEXT_xlevel1text5, 0, 0, 0, 0, TEXT_xlevel1textC
+	0, TEXT_xlevel1text1, TEXT_xlevel1text2, 0, 0, TEXT_xlevel1text5, 0, 0, 0, 0, 0, 0, TEXT_xlevel1textC, TEXT_xlevel1textD, 0, 0
 };
 
 const unsigned char* const xbgmtexts2[] = {
-	TEXT_xlevel2text8, TEXT_xlevel2textB, TEXT_xlevel2textE, TEXT_2textpractice, TEXT_2textmenu, TEXT_xlevel2text3, TEXT_xlevel2text7, TEXT_xlevel2textD, TEXT_xlevel2text1, TEXT_xlevel2text2, TEXT_xlevel2text5, TEXT_xlevel2text9, TEXT_xlevel2text4, TEXT_xlevel2text6, TEXT_xlevel2textA, TEXT_xlevel2textC, 
+	TEXT_2textmenu, TEXT_xlevel2text1, TEXT_xlevel2text2, TEXT_xlevel2text3, TEXT_xlevel2text4, TEXT_xlevel2text5, TEXT_xlevel2text6, TEXT_xlevel2text7, TEXT_xlevel2text8, TEXT_xlevel2text9, TEXT_xlevel2textA, TEXT_xlevel2textB, TEXT_xlevel2textC, TEXT_xlevel2textD, TEXT_xlevel2textE, TEXT_2textpractice
 };
 
 const unsigned char xbgmtext2_size[] = {
-	sizeof(TEXT_xlevel2text8) - 1,
-	sizeof(TEXT_xlevel2textB) - 1,
-	sizeof(TEXT_xlevel2textE) - 1,
-	sizeof(TEXT_2textpractice) - 1,
-	sizeof(TEXT_2textmenu) - 1,	
-	sizeof(TEXT_xlevel2text3) - 1,
-	sizeof(TEXT_xlevel2text7) - 1,	
-	sizeof(TEXT_xlevel2textD) - 1,	
+	sizeof(TEXT_2textmenu) - 1,
 	sizeof(TEXT_xlevel2text1) - 1,	
 	sizeof(TEXT_xlevel2text2) - 1,	
-	sizeof(TEXT_xlevel2text5) - 1,	
-	sizeof(TEXT_xlevel2text9) - 1,	
+	sizeof(TEXT_xlevel2text3) - 1,
 	sizeof(TEXT_xlevel2text4) - 1,	
+	sizeof(TEXT_xlevel2text5) - 1,	
 	sizeof(TEXT_xlevel2text6) - 1,	
+	sizeof(TEXT_xlevel2text7) - 1,	
+	sizeof(TEXT_xlevel2text8) - 1,
+	sizeof(TEXT_xlevel2text9) - 1,	
 	sizeof(TEXT_xlevel2textA) - 1,	
+	sizeof(TEXT_xlevel2textB) - 1,
 	sizeof(TEXT_xlevel2textC) - 1,	
+	sizeof(TEXT_xlevel2textD) - 1,	
+	sizeof(TEXT_xlevel2textE) - 1,
+	sizeof(TEXT_2textpractice) - 1,
 };
 const unsigned char xbgmtext1_size[] = {
 	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	sizeof(TEXT_xlevel1textD) - 1,	
 	sizeof(TEXT_xlevel1text1) - 1,	
 	sizeof(TEXT_xlevel1text2) - 1,	
+	0,
+	0,
 	sizeof(TEXT_xlevel1text5) - 1,	
 	0,
 	0,
 	0,
 	0,
+	0,
+	0,
 	sizeof(TEXT_xlevel1textC) - 1,	
+	sizeof(TEXT_xlevel1textD) - 1,	
+	0,
+	0,
 };
 
+
+const uint8_t xbgm_lookup_table2[] = {
+	song_menu_theme,
+	song_stereo_madness,
+	song_back_on_track,
+	song_polargeist,
+	song_dry_out,
+	song_base_after_base,
+	song_cant_let_go,
+	song_jumper,
+	song_time_machine,
+	song_cycles,
+	song_xstep, 
+	song_clutterfunk,
+	song_theory_of_everything, 
+	song_electroman_adventures, 
+	song_custom_endgame, 
+	song_practice,
+};
 
 
 
@@ -516,6 +537,7 @@ const char TEXT_debug_mode[] = "DEBUG MODE ENABLED";
 //#include "defines/bgm_charmap.h"
 void bgmtest() {
 	song = 0;
+	temptemp6 = 0; 	
 	#define sfx tmp4
 	sfx = 0;
 	settingvalue = 0;
@@ -535,7 +557,7 @@ void bgmtest() {
 		ppu_wait_nmi();
 		music_update();
 		oam_clear();
-
+		crossPRGBankJump0(check_if_music_stopped);
 		mouse_and_cursor();
 		 // read the first controller
 		kandoframecnt++;
@@ -552,7 +574,8 @@ void bgmtest() {
 			if ((mouse.x >= 0x2E && mouse.x <= 0xCC) && (mouse.y >= 0xAC && mouse.y <= 0xB3)) {		
 				if (settingvalue == 1) { sfx_play(sfx, 0); }
 				else {
-					music_play(song);
+					if (!temptemp6) { music_play(xbgm_lookup_table2[song]); temptemp6 = 1; songplaying = 1; }
+					else { famistudio_music_stop(); music_update(); temptemp6 = 0; songplaying = 0; }
 				}
 			}
 			if ((mouse.x >= 0x56 && mouse.x <= 0xA5) && (mouse.y >= 0x24 && mouse.y <= 0x2B)) {		
@@ -561,10 +584,10 @@ void bgmtest() {
 			}
 			if ((mouse.y >= 0x4E && mouse.y <= 0x5C)) {
 				if ((mouse.x >= 0x24 && mouse.x <= 0x2C)) {		
-					if (song == 0) {song = song_max - 1;} else song--; settingvalue = 0;
+					if (song == 0) {song = song_max - 1;} else song--; temptemp6 = 0; settingvalue = 0;
 				}
 				else if ((mouse.x >= 0xCC && mouse.x <= 0xD4)) {		
-					song++; if (song == song_max) {song = 0;} settingvalue = 0;
+					temptemp6 = 0; song++; if (song == song_max) {song = 0;} settingvalue = 0;
 				}
 			}
 			if ((mouse.y >= 0x86 && mouse.y <= 0x93)) {
@@ -586,7 +609,8 @@ void bgmtest() {
 					return;
 				}
 				else if (mouse.y >= 0x3D && mouse.y <= 0x64) {
-					music_play(song);
+					if (!temptemp6) { music_play(xbgm_lookup_table2[song]); temptemp6 = 1; songplaying = 1; }
+					else { famistudio_music_stop(); music_update(); temptemp6 = 0; songplaying = 0; }
 				}
 				else if (mouse.y >= 0x75 && mouse.y <= 0x9C) {
 					sfx_play(sfx, 0);
@@ -594,21 +618,24 @@ void bgmtest() {
 			}
 		}			
 	__A__ = idx16_load_hi_NOC(xbgmtexts1, song);
-	if (__A__) draw_padded_text(xbgmtexts1[song & 0x7F], xbgmtext1_size[song], 17, NTADR_A(7, 10));
+	if (__A__) draw_padded_text(xbgmtexts1[song & 0x7F], xbgmtext1_size[song], 18, NTADR_A(7, 10));
 	else one_vram_buffer_horz_repeat('$', 17, NTADR_A(7, 10));
 	__A__ = idx16_load_hi_NOC(xbgmtexts2, song);
-	if (__A__) draw_padded_text(xbgmtexts2[song & 0x7F], xbgmtext2_size[song], 17, NTADR_A(7, 11));
+	if (__A__) draw_padded_text(xbgmtexts2[song & 0x7F], xbgmtext2_size[song], 18, NTADR_A(7, 11));
 	else one_vram_buffer_horz_repeat('$', 17, NTADR_A(7, 11));
 	
-	draw_padded_text(sfxtexts[sfx & 0x7F], sfxtexts_size[sfx], 17, NTADR_A(7, 18));
+	draw_padded_text(sfxtexts[sfx & 0x7F], sfxtexts_size[sfx], 18, NTADR_A(7, 18));
 
 	
 		if (settingvalue == 0) {
 			one_vram_buffer('c', NTADR_A(11, 7));
 			one_vram_buffer(' ', NTADR_A(11, 14));
-			if (joypad1.press_right) { song++; if (song == song_max) {song = 0;} }
-			if (joypad1.press_left) { if (song == 0) {song = song_max - 1;} else song--; }
-			if (joypad1.press_a) music_play(song);
+			if (joypad1.press_right) { song++; temptemp6 = 0; if (song == song_max) {song = 0;} }
+			if (joypad1.press_left) { if (song == 0) {song = song_max - 1;} else song--; temptemp6 = 0; }
+			if (joypad1.press_a) {
+					if (!temptemp6) { music_play(xbgm_lookup_table2[song]); temptemp6 = 1; songplaying = 1; }
+					else { famistudio_music_stop(); music_update(); temptemp6 = 0; songplaying = 0; }
+			}					
 		}		
 		else if (settingvalue == 1) {
 			one_vram_buffer(' ', NTADR_A(11, 7));
@@ -639,8 +666,65 @@ void bgmtest() {
 			if (gameState == 0xF0) return;
 		}
 	}
-	#undef sfx
 }
+
+void code_checker() {
+	last_gameState = gameState;
+	sfx_play(sfx_achievement_get, 0);
+	tmp3 = 1;
+
+	// bgm 9 & sfx 2
+	if (song == 0x9 && sfx == 0x2) {
+		gameState = 0xF0; // fun settings gamestate
+		tmp3--;
+	}
+	if (song == 0xB && sfx == 0x7) {
+		multi_vram_buffer_horz(TEXT_debug_mode, sizeof(TEXT_debug_mode)-1, NTADR_A(7,26));
+		options |= debugtoggle;
+		tmp3--;
+	}
+
+	// this is quite literally the greatest hack ever
+	// since sfx doesn't update until the next frame i can just
+	// overwrite the success sfx with the invalid one
+	if (tmp3) sfx_play(sfx_invalid, 0);	
+}
+
+#undef sfx
+
+
+const unsigned char bgmtestscreen[440]={
+0x01,0x02,0x01,0x04,0xae,0x02,0x01,0x13,0xae,0x02,0x01,0x09,0xaf,0x02,0x01,0x13,
+0xaf,0x02,0x01,0x06,0x06,0x07,0x04,0x01,0x17,0x06,0x07,0x02,0x01,0x03,0x08,0x09,
+0x05,0x01,0x17,0x08,0x09,0x02,0x01,0x03,0x0c,0xff,0x01,0x19,0x0d,0x02,0x01,0x03,
+0x0c,0xff,0x01,0x07,0xf3,0xef,0xf5,0xee,0xe4,0xff,0xf4,0xe5,0xf3,0xf4,0xff,0x01,
+0x07,0x0d,0x02,0x01,0x03,0x0c,0xff,0x01,0x19,0x0d,0x02,0x01,0x03,0x0c,0xff,0x01,
+0x09,0xed,0xf5,0xf3,0xe9,0xe3,0xff,0x01,0x0a,0x0d,0x02,0x01,0x03,0x0c,0xff,0x01,
+0x03,0x5c,0xfe,0x01,0x0f,0x5d,0xff,0x01,0x03,0x0d,0x02,0x01,0x03,0x0c,0xff,0x01,
+0x03,0xfe,0x01,0x11,0xff,0x01,0x03,0x0d,0x02,0x01,0x03,0x0c,0xff,0xff,0x6e,0xff,
+0xfe,0x01,0x11,0xff,0x6f,0xff,0xff,0x0d,0x02,0x01,0x03,0x0c,0xff,0xff,0x7e,0xff,
+0xfe,0x01,0x11,0xff,0x7f,0xff,0xff,0x0d,0x02,0x01,0x03,0x0c,0xff,0x01,0x03,0x6c,
+0xfe,0x01,0x0f,0x6d,0xff,0x01,0x03,0x0d,0x02,0x01,0x03,0x0c,0xff,0x01,0x19,0x0d,
+0x02,0x01,0x03,0x0c,0xff,0x01,0x09,0xf3,0xef,0xf5,0xee,0xe4,0xff,0x01,0x0a,0x0d,
+0x02,0x01,0x03,0x0c,0xff,0x01,0x03,0x5c,0xfe,0x01,0x0f,0x5d,0xff,0x01,0x03,0x0d,
+0x02,0x01,0x03,0x0c,0xff,0x01,0x03,0xfe,0x01,0x11,0xff,0x01,0x03,0x0d,0x02,0x01,
+0x03,0x0c,0xff,0xff,0x6e,0xff,0xfe,0x01,0x11,0xff,0x6f,0xff,0xff,0x0d,0x02,0x01,
+0x03,0x0c,0xff,0xff,0x7e,0xff,0xfe,0x01,0x11,0xff,0x7f,0xff,0xff,0x0d,0x02,0x01,
+0x03,0x0c,0xff,0x01,0x03,0x6c,0xfe,0x01,0x0f,0x6d,0xff,0x01,0x03,0x0d,0x02,0x01,
+0x03,0x0c,0xff,0x01,0x19,0x0d,0x02,0x01,0x03,0x0c,0xff,0x01,0x19,0x0d,0x02,0x01,
+0x03,0x0c,0xff,0xff,0xf0,0xf2,0xe5,0xf3,0xf3,0xff,0xe1,0xff,0xf4,0xef,0xff,0xf0,
+0xec,0xe1,0xf9,0xff,0xe0,0xff,0xf3,0xf4,0xef,0xf0,0xff,0xff,0x0d,0x02,0x01,0x03,
+0x0c,0xff,0x01,0x19,0x0d,0x02,0x01,0x03,0x0c,0xff,0x01,0x03,0xf0,0xf2,0xe5,0xf3,
+0xf3,0xff,0xe2,0xff,0xf4,0xef,0xff,0xf2,0xe5,0xf4,0xf5,0xf2,0xee,0xff,0x01,0x04,
+0x0d,0x02,0x01,0x03,0x0c,0xff,0x01,0x19,0x0d,0x02,0x01,0x03,0x0a,0x0b,0x04,0x01,
+0x09,0x06,0x0e,0x0e,0x07,0x04,0x01,0x09,0x0a,0x0b,0x02,0x01,0x05,0x05,0x01,0x09,
+0x08,0x05,0x05,0x09,0x05,0x01,0x09,0x02,0x01,0x43,0xff,0x5c,0x5f,0x01,0x03,0x53,
+0xff,0x77,0x00,0x01,0x05,0xdd,0x77,0x00,0x01,0x05,0xdd,0x77,0x00,0x01,0x05,0xdd,
+0x77,0x00,0x01,0x05,0xdd,0x77,0x00,0x01,0x05,0xdd,0xf7,0x50,0x50,0xd0,0x70,0x50,
+0x50,0xfd,0x0f,0x01,0x06,0x0f,0x01,0x00
+};
+
+CODE_BANK_POP()
 
 
 void gameboy_check() {
@@ -725,7 +809,7 @@ void funsettings() {
 		ppu_wait_nmi();
 		music_update();
 		oam_clear();
-
+		crossPRGBankJump0(check_if_music_stopped);
 		mouse_and_cursor();
 		 // read the first controller
 		if (mouse.left_press) {
@@ -899,6 +983,7 @@ void code_checker() {
 
 
 
+
 const unsigned char* const leveltexts[] = {
   level1text, level2text, NULL, NULL, level5text, NULL, NULL, NULL, NULL, NULL, NULL, levelCtext, levelDtext, NULL, NULL, NULL, NULL, NULL, NULL, NULL, level15text
 };
@@ -1023,6 +1108,7 @@ void refreshmenu_part2(void) {
 		pal_col(0xE,colors_list[tmp3]);
 		
 		pal_col(0x10,colors_list[tmp3]);
+		pal_col(0x12,0x2a);
 		pal_col(0x16,0x12);
 		pal_col(0x1a,0x12);
 		pal_col(0x1E,colors_list[tmp3]);
