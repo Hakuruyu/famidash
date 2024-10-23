@@ -51,7 +51,7 @@
 // increment by 1 for officially released patches.
 // does nothing if FLAG_BETA_BUILD is uncommented.
 #define FLAG_MIN_VER '0'
-#define FLAG_REV_VER '2'
+#define FLAG_REV_VER '4'
 // ============================================================
 
 

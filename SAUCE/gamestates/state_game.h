@@ -329,7 +329,7 @@ void state_game(){
 				else if (kandokidshack3 == 20) kandodebugmode ^= 1;
 				else kandokidshack3 = 0;
 			}
-//		if (options & debugtoggle) {
+		if (options & debugtoggle) {
 			if (joypad1.press_select) //THE BIG DEBUG - DISABLE BEFORE RELEASE
 				{ 
 					DEBUG_MODE = !DEBUG_MODE; 
@@ -337,7 +337,7 @@ void state_game(){
 					cube_data[1] &= 2; 
 					if (!DEBUG_MODE) nocamlock = 0;
 				}		
-//		}
+		}
 
 		if (has_practice_point > 1 && (joypad1.press_select || (mouse.left && mouse.right_press))) { has_practice_point--; curr_practice_point = 0; }
 		
