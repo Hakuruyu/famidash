@@ -137,7 +137,7 @@ void restore_practice_state() {
 	parallax_scroll_x = practice_parallax_scroll_x[tmp2];
 	scroll_x = practice_scroll_x[tmp2] - (256 + 16);
 	old_trail_scroll_y = scroll_y = practice_scroll_y[tmp2];
-	tmp2 = 0;
+//	tmp2 = 0;
 //	do {
 //		idx8_store(trail_sprites_visible, tmp2, practice_trail_sprites_visible[tmp2]);
 //		idx8_store(player_old_posy, tmp2, practice_player_old_posy[tmp2]);
