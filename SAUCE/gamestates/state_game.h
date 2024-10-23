@@ -218,7 +218,10 @@ void state_game(){
 				dual = 1;
 			}
 			
-			if (!(joypad1.a)) dashing[0] = 0;
+			if (!(joypad1.a)) {
+				if (dashing[0] == 2 || dashing[0] == 3) currplayer_vel_y = 0x0100^(0x0000 - currplayer_gravity);
+				dashing[0] = 0;
+			}
 
 			//mouse debug here
 			if (kandodebugmode) {
@@ -325,14 +328,14 @@ void state_game(){
 				else if (kandokidshack3 == 20) kandodebugmode ^= 1;
 				else kandokidshack3 = 0;
 			}
-		if (options & debugtoggle) {
+//		if (options & debugtoggle) {
 			if (joypad1.press_select) //THE BIG DEBUG - DISABLE BEFORE RELEASE
 				{ 
 					DEBUG_MODE = !DEBUG_MODE; 
 					cube_data[0] &= 2; 
 					cube_data[1] &= 2; 
 				}		
-		}
+//		}
 
 		if (has_practice_point > 1 && (joypad1.press_select || (mouse.left && mouse.right_press))) { has_practice_point--; curr_practice_point = 0; }
 		
@@ -439,7 +442,10 @@ void state_game(){
 		
 		if (dual) { 
 			currplayer = 1;					//take focus
-			if (!(joypad2.a)) dashing[1] = 0;
+			if (!(joypad2.a)) {
+				if (dashing[1] == (4 | 5)) currplayer_vel_y = 0;
+				dashing[1] = 0;
+			}
 			if (twoplayer) controllingplayer = &joypad2;		//take controls
 			if (dual && (options & platformer) && !twoplayer) { player_x[1] = player_x[0]; player_vel_x[1] = player_vel_x[0]; }
 			else if (dual && !(options & platformer)) { player_x[1] = player_x[0]; player_vel_x[1] = player_vel_x[0]; }
