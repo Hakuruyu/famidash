@@ -181,12 +181,12 @@ _level_lengths_lo:
   .byte .lobyte($000087)		; thelightningroad
   .byte .lobyte($000098)		; nightmare
   .byte .lobyte($00008A)		; decode
-  .byte .lobyte($000109)		; eon
+  .byte .lobyte($000285)		; eon
   .byte .lobyte($000086)		; luckydraw
   .byte .lobyte($000080)		; test
   .byte .lobyte($00006E)		; test2
   .byte .lobyte($000069)		; test3
-  .byte .lobyte($000019)		; test4
+  .byte .lobyte($000080)		; test4
   .byte .lobyte($000006)		; danger
 
 .if MID_LEVEL_LENGTHS_ENABLED
@@ -209,12 +209,12 @@ _level_lengths_md:
   .byte .hibyte($000087)		; thelightningroad
   .byte .hibyte($000098)		; nightmare
   .byte .hibyte($00008A)		; decode
-  .byte .hibyte($000109)		; eon
+  .byte .hibyte($000285)		; eon
   .byte .hibyte($000086)		; luckydraw
   .byte .hibyte($000080)		; test
   .byte .hibyte($00006E)		; test2
   .byte .hibyte($000069)		; test3
-  .byte .hibyte($000019)		; test4
+  .byte .hibyte($000080)		; test4
   .byte .hibyte($000006)		; danger
 
 .if HIGH_LEVEL_LENGTHS_ENABLED
@@ -237,12 +237,12 @@ _level_lengths_hi:
   .byte .bankbyte($000087)		; thelightningroad
   .byte .bankbyte($000098)		; nightmare
   .byte .bankbyte($00008A)		; decode
-  .byte .bankbyte($000109)		; eon
+  .byte .bankbyte($000285)		; eon
   .byte .bankbyte($000086)		; luckydraw
   .byte .bankbyte($000080)		; test
   .byte .bankbyte($00006E)		; test2
   .byte .bankbyte($000069)		; test3
-  .byte .bankbyte($000019)		; test4
+  .byte .bankbyte($000080)		; test4
   .byte .bankbyte($000006)		; danger
 
 .endif

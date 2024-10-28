@@ -37,29 +37,6 @@ const uint8_t G_Table[]={
 	0x2C
 };
 
-#define stereo_madness  0
-#define back_on_track  1
-#define polargeist  2
-#define dryout  3
-#define base_after_base  4
-#define cant_let_go  5
-#define jumper  6
-#define time_machine  7
-#define cycles  8
-#define xstep  9
-#define clutterfunk  0x0A
-#define theory_of_everything  0x0B
-#define electroman_adventures  0x0C
-#define leveleasy  0x0D
-#define lightningroad  0xE
-#define nightmare  0x0F
-#define decode  0x10
-#define eon  0x11
-#define luckydraw  0x12
-#define test  0x13
-#define test2  0x14
-#define test3  0x15
-#define test4  0X16
 
 
 void x_minus_15();
@@ -225,7 +202,7 @@ void state_game(){
 			}
 			
 			if (!(joypad1.a)) {
-				if (dashing[0] == 2 || dashing[0] == 3) currplayer_vel_y = 0x0100^(0x0000 - currplayer_gravity);
+				if (dashing[0]) currplayer_vel_y = 0x0100^(0x0000 - currplayer_gravity);
 				dashing[0] = 0;
 			}
 
@@ -451,7 +428,7 @@ void state_game(){
 		if (dual) { 
 			currplayer = 1;					//take focus
 			if (!(joypad2.a)) {
-				if (dashing[1] == (4 | 5)) currplayer_vel_y = 0;
+				if (dashing[1]) currplayer_vel_y = 0x0100^(0x0000 - currplayer_gravity);
 				dashing[1] = 0;
 			}
 			if (twoplayer) controllingplayer = &joypad2;		//take controls

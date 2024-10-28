@@ -66,12 +66,12 @@ const uint8_t DECOTYPE[] = {
 	DECO1, //LIGHTNING ROAD
 	DECOCLOUD, //NIGHTMARE
 	DECOCLOUD, //DECODE
-	DECOCLOUD, //EON
+	EXTRASPRITES1, //EON
 	DECOCLOUD, //lucky draw
 	EXTRASPRITES1,
 	EXTRASPRITES1,
 	DECOCLOUD,
-	EXTRASPRITES1,
+	DECO1,
 	EXTRASPRITES1, //danger
 };
 
@@ -120,12 +120,12 @@ const unsigned char block_set[] = {
 	BLOCKSA, //LIGHTNING ROAD
 	BLOCKSC, //nightmare
 	BLOCKSB, //decode
-	BLOCKSB, //EON
+	BLOCKSA, //EON
 	BLOCKSB, //lucky draw
 	BLOCKSA, //test1
 	BLOCKSB, //test2
 	BLOCKSB, //test3
-	BLOCKSA, //test4
+	BLOCKSB, //test4
 	SAWBLADESA, //danger
 };
 
@@ -171,7 +171,7 @@ const unsigned char difficulty_list[] = {
     INSANE,
     INSANE,
     INSANE,
-    EASY, //LEVEL EASY
+    NORMAL, //LEVEL EASY
     DEMON, //lightning road
     DEMON, //nightmare
     DEMON, //decode
