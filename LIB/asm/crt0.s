@@ -26,10 +26,13 @@ OAM_BUF=__OAM_BUF_START__
 PAL_BUF_RAW=__PAL_BUF_START__
 PAL_BUF=PAL_BUF_RAW+$20
 
+SFX_STRINGS = 0
 
 ; .importzp _PAD_STATE, _PAD_STATET ;added
 .include "zeropage.inc"
 
+.include "music_songlist.inc"
+.include "sfx_sfxlist.inc"
 
 
 
@@ -65,12 +68,12 @@ SCROLL_X: 			.res 1
 SCROLL_Y: 			.res 1
 SCROLL_X1: 			.res 1
 SCROLL_Y1: 			.res 1
-; PAD_STATE: 			.res 2		;one byte per controller
-; PAD_STATE2: 		.res 2		;one byte per controller
-; PAD_STATEP: 		.res 2
-; PAD_STATEP2: 		.res 2
-; PAD_STATET: 		.res 2
-; PAD_STATET2: 		.res 2
+PAD_STATE: 			.res 2		;one byte per controller
+PAD_STATE2: 		.res 2		;one byte per controller
+PAD_STATEP: 		.res 2
+PAD_STATEP2: 		.res 2
+PAD_STATET: 		.res 2
+PAD_STATET2: 		.res 2
 PPU_CTRL_VAR: 		.res 1
 PPU_CTRL_VAR1: 		.res 1
 PPU_MASK_VAR: 		.res 1
@@ -79,7 +82,7 @@ RAND_SEED: 			.res 4
 TEMP: 				.res 11
 SPRID:				.res 1
 
-; PAD_BUF		=TEMP+1
+PAD_BUF		=TEMP+1
 
 PTR			=TEMP	;word
 LEN			=TEMP+2	;word
@@ -105,6 +108,7 @@ VRAM_INDEX:			.res 1
 ; META_VAR:			.res 1
 
 xargs:				.res 4
+noMouse:			.res 1
 
  
 ;
@@ -373,7 +377,8 @@ _GAME_CHR:
     .incbin "GRAPHICS/BlocksD.chr" ; (10)
     .incbin "GRAPHICS/SawbladesA.chr" ; (12)
     .incbin "GRAPHICS/slopesA.chr" ; (14)
-    .incbin "GRAPHICS/slopesA.chr" ; ()
+;    .incbin "GRAPHICS/slopesA.chr" ; ()
+    .incbin "GRAPHICS/practicecomplete.chr"    ; 1kb (15)
 
     .incbin "GRAPHICS/so_retro_v2.chr" ; 1kb (16) 
     .incbin "GRAPHICS/bankportals.chr" ; 1kb
@@ -412,18 +417,21 @@ _GAME_CHR:
         .incbin "GRAPHICS/bankportals.chr" ; 1kb
     .endrepeat
 
-    .incbin "GRAPHICS/banktriangle.chr" ; 1kb (92)
+        .incbin "fan icon collection/starfox.chr" ; 1kb (92)
+        .incbin "GRAPHICS/bankportals.chr" ; 1kb
+
+    .incbin "GRAPHICS/banktriangle.chr" ; 1kb (94)
     .incbin "GRAPHICS/bankportals.chr" ; 1kb
     
-    .incbin "GRAPHICS/cursors.chr" ; 2kb (94)
+    .incbin "GRAPHICS/cursors.chr" ; 2kb (96)
 
-    .incbin "GRAPHICS/SawbladesNone.chr" ; 2kb (96)
+    .incbin "GRAPHICS/SawbladesNone.chr" ; 2kb (98)
 
 
-    .incbin "GRAPHICS/menus.chr"    ; 4kb (98)
-    .incbin "GRAPHICS/menuicons.chr"    ; 4kb (102)
-    .incbin "GRAPHICS/levelcomplete.chr"    ; 4kb (106)
-    .incbin "GRAPHICS/practicecomplete.chr"    ; 1kb (110)
+    .incbin "GRAPHICS/menus.chr"    ; 4kb (100)
+    .incbin "GRAPHICS/menuicons.chr"    ; 4kb (104)
+    .incbin "GRAPHICS/levelcomplete.chr"    ; 4kb (108)
+ ;   .incbin "GRAPHICS/practicecomplete.chr"    ; 1kb (112)
 
 .segment "PARALLAXCHR"  ; banks 112 - 255
 .export _PARALLAX_CHR

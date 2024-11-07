@@ -25,32 +25,20 @@ void spider_movement(void){
 	spider_eject();
 	
 	if (!currplayer_gravity) {
-		if(controllingplayer->press_a && currplayer_vel_y == 0) {
+		if((controllingplayer->press_a || controllingplayer->press_up) && currplayer_vel_y == 0) {
 			jumps++;
 			currplayer_gravity = 1;
-			do {
-				high_byte(currplayer_y) -= 0x08;
-				crossPRGBankJump0(do_the_scroll_thing);				
-				if (currplayer_y < 0x0600 && scroll_y <= min_scroll_y){
-					idx8_store(cube_data, currplayer, cube_data[currplayer] | 0x01);	//DIE if player goes too high
-					break;
-				}
-				Generic.y = high_byte(currplayer_y); // the rest should be the same
-			} while (!bg_coll_U());
+			spider_up_wait();
 			high_byte(currplayer_y) -= eject_U;
 			currplayer_vel_y = 0;
 		}
 }	
 	else {
-		if(controllingplayer->press_a && currplayer_vel_y == 0) {
+		if((controllingplayer->press_a || controllingplayer->press_up) && currplayer_vel_y == 0) {
 			jumps++;
 			currplayer_gravity = 0;
-			do {
-				high_byte(currplayer_y) += 0x08;
-				crossPRGBankJump0(do_the_scroll_thing);				
-				
-				Generic.y = high_byte(currplayer_y); // the rest should be the same
-			} while (!bg_coll_D());
+
+			spider_down_wait();
 
 			high_byte(currplayer_y) -= eject_D;
 			
@@ -71,11 +59,7 @@ void spider_movement(void){
 	// check collision down a little lower than CUBE
 	Generic.y = high_byte(currplayer_y); // the rest should be the same
 
-	if (currplayer_vel_y != 0){
-		if(controllingplayer->press_a) {
-			idx8_store(cube_data, currplayer, cube_data[currplayer] | 0x02);
-		}
-	}
+
 }	
 
 
@@ -98,23 +82,29 @@ void spider_eject() {
 }
 
 void spider_up_wait() {
+	tmp7 = Generic.x + low_word(scroll_x);
+	tmp9 = tmp7 + (Generic.width >> 1);
+	tmp3 = tmp7 + Generic.width;
 	do {
 		high_byte(currplayer_y) -= 0x08;
 		crossPRGBankJump0(do_the_scroll_thing);
-		if (currplayer_y < 0x0600 && scroll_y <= min_scroll_y){
+		if (high_byte(currplayer_y) <= 0x06 && scroll_y <= min_scroll_y){
 			idx8_store(cube_data, currplayer, cube_data[currplayer] | 0x01);	//DIE if player goes too high
 			break;
 		}
 		Generic.y = high_byte(currplayer_y); // the rest should be the same
-	} while (!bg_coll_U());
+	} while (!bg_coll_U_spider());
 }			
 
 void spider_down_wait() {
+	tmp7 = Generic.x + low_word(scroll_x);
+	tmp9 = tmp7 + (Generic.width >> 1);
+	tmp3 = tmp7 + Generic.width;
 	do {
 		high_byte(currplayer_y) += 0x08;
 		crossPRGBankJump0(do_the_scroll_thing);
 		Generic.y = high_byte(currplayer_y); // the rest should be the same
-	} while (!bg_coll_D());
+	} while (!bg_coll_D_spider());
 }				
 
 CODE_BANK_POP()

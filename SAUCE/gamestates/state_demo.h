@@ -65,6 +65,7 @@ const unsigned char Credits[364]={
 
 
 
+
 const unsigned char Credits2[370]={
 0x01,0xfe,0x01,0x3f,0xff,0x01,0x1a,0x0a,0x06,0x07,0x92,0x93,0xff,0x01,0x1b,0x08,
 0x09,0xa2,0xa3,0xff,0x01,0x02,0xed,0xf5,0xf3,0xe9,0xe3,0xff,0x01,0x14,0x2a,0x06,
@@ -121,11 +122,11 @@ void state_demo(){
 	vram_unrle(Credits2);
 
 	
-	multi_vram_buffer_horz(ver, sizeof(ver)-1, NTADR_A(21,27));
-	one_vram_buffer(FLAG_MAJ_VER, NTADR_A(26,27));
+	multi_vram_buffer_horz(ver, sizeof(ver)-1, NTADR_A(1,3));
+	one_vram_buffer(FLAG_MAJ_VER, NTADR_A(6,3));
 	#ifdef FLAG_BETA_BUILD
-		one_vram_buffer(0x18, NTADR_A(27,27)); // dot
-		one_vram_buffer(FLAG_MIN_VER, NTADR_A(28,27));
+		one_vram_buffer(0x18, NTADR_A(7,3)); // dot
+		one_vram_buffer(FLAG_MIN_VER, NTADR_A(8,3));
 	#endif
 	
 	// __asm__("LDA mmc3PRG1Bank \nPHA ");

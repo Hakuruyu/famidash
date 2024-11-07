@@ -16,22 +16,23 @@
 #define leveleasy  0x0D
 #define lightningroad  0xE
 #define nightmare  0x0F
-#define decode  0x10
-#define eon  0x11
-#define luckydraw  0x12
-#define test  0x13
-#define test2  0x14
-#define test3  0x15
-#define test4  0X16
+#define demonpark  0x10
+#define decode  0x11
+#define eon  0x12
+#define luckydraw  0x13
+#define test  0x14
+#define test2  0x15
+#define test3  0x16
+#define test4  0X17
 
 
-#define NINJABANK 92
-#define MOUSEBANK 94
-#define LETTERBANK 96
-#define MENUBANK 98
-#define MENUICONBANK 102
-#define LEVELCOMPLETEBANK 106
-#define PRACTICECOMPLETEBANK 110
+#define NINJABANK 94
+#define MOUSEBANK 96
+#define LETTERBANK 98
+#define MENUBANK 100
+#define MENUICONBANK 104
+#define LEVELCOMPLETEBANK 108
+#define PRACTICECOMPLETEBANK 15
 
 #define SPIKESA 0
 #define SPIKESB 2
@@ -47,7 +48,7 @@
 #define GAME 0x02
 
 
-#define MAX_ICONS 27 //total icons
+#define MAX_ICONS 28 //total icons
 
 // physics defines
 #define ORB_HEIGHT_YELLOW_UPSIDE2 -0x580
@@ -61,8 +62,8 @@
 #define MINI_CUBE_WIDTH 0x08
 #define MINI_CUBE_HEIGHT 0x07
 
-#define WAVE_WIDTH 0x03
-#define WAVE_HEIGHT 0x03
+#define WAVE_WIDTH 0x01
+#define WAVE_HEIGHT 0x01
 
 #define MINI_WAVE_WIDTH 0x01
 #define MINI_WAVE_HEIGHT 0x01
@@ -161,6 +162,7 @@ int8_t tmpi8;
 extern volatile unsigned char VRAM_UPDATE;
 #pragma zpsym ("VRAM_UPDATE")
 
+uint8_t currplayer_mini;
 uint16_t currplayer_x;
 uint16_t currplayer_y;
 int16_t currplayer_vel_x;
@@ -183,7 +185,7 @@ uint8_t collision_D;
 uint16_t old_x;
 uint16_t old_y;
 
-uint8_t mini;
+uint8_t mini[2];
 uint8_t eject_L; // from the left
 uint8_t eject_R; // remember these from the collision sub routine
 uint8_t eject_D; // from below
@@ -223,7 +225,7 @@ uint8_t SRAM_VALIDATE[4];
 #ifdef FLAG_ENABLE_TEST_LEVELS
 	#define LEVEL_COUNT2 256
 #else
-	#define LEVEL_COUNT2 23
+	#define LEVEL_COUNT2 24
 #endif
 
 
@@ -311,9 +313,10 @@ uint8_t long_temp_x;
 uint8_t kandokidshack;
 uint8_t kandokidshack2;
 uint8_t kandokidshack3;
+uint8_t kandokidshack4;
 
 uint16_t exittimer;
-uint8_t jumps;
+uint16_t jumps;
 uint8_t orbed[2];
 uint8_t speed;
 uint8_t shuffle_offset;
@@ -359,6 +362,7 @@ uint16_t triggers;
 uint16_t top_triggers;
 
 uint8_t nocamlock;
+uint8_t nestopia;
 
 uint8_t last_slope_type;
 
@@ -407,7 +411,7 @@ uint8_t curr_practice_point;
 uint16_t practice_player_x[2*MAX_PRACTICE_POINTS];
 uint16_t practice_player_y[2*MAX_PRACTICE_POINTS];
 uint8_t practice_player_gamemode[MAX_PRACTICE_POINTS];
-uint8_t practice_mini[MAX_PRACTICE_POINTS];
+uint8_t practice_mini[2*MAX_PRACTICE_POINTS];
 uint8_t practice_dual[MAX_PRACTICE_POINTS];
 uint8_t practice_speed[MAX_PRACTICE_POINTS];
 uint16_t practice_cube_rotate[2*MAX_PRACTICE_POINTS];

@@ -128,6 +128,7 @@ void levelselection() {
 	mmc3_set_2kb_chr_bank_1(MOUSEBANK);
 	pal_fade_to_withmusic(4,0);
 	mmc3_disable_irq();
+	disco_sprites = 0;
 
 	write_irq_table(lvlselect_irq_table);
 	set_irq_ptr(irqTable);
@@ -163,7 +164,7 @@ void levelselection() {
 	cube_rotate[0] = 0;
 	cube_rotate[1] = 0;
 
-	if (kandotemp == 0) music_play(song_menu_theme);
+	if (kandotemp == 0 && !nestopia) music_play(song_menu_theme);
 	kandotemp = 1;
 
 	ppu_on_all();
@@ -559,11 +560,19 @@ void customize_screen() {
 //end mouse stuff
 		if (!retro_mode) {
 			if (icon != prev_icon) {
-				tmp1 = iconTable[icon] + 'a';
-				one_vram_buffer(tmp1, NTADR_A(15, 8));
-				one_vram_buffer(++tmp1, NTADR_A(16, 8));
-				one_vram_buffer((tmp1 += ('c'-'b')), NTADR_A(15, 9));
-				one_vram_buffer(++tmp1, NTADR_A(16, 9));
+				if (icon != 27) {
+					tmp1 = iconTable[icon] + 'a';
+					one_vram_buffer(tmp1, NTADR_A(15, 8));
+					one_vram_buffer(++tmp1, NTADR_A(16, 8));
+					one_vram_buffer((tmp1 += ('c'-'b')), NTADR_A(15, 9));
+					one_vram_buffer(++tmp1, NTADR_A(16, 9));
+				}
+				else {
+						one_vram_buffer(0x1C, NTADR_A(15, 8));				
+						one_vram_buffer(0x1D, NTADR_A(16, 8));				
+						one_vram_buffer(0x1E, NTADR_A(15, 9));				
+						one_vram_buffer(0x1F, NTADR_A(16, 9));				
+				}
 				prev_icon = icon;
 			}
 		} else {
@@ -698,6 +707,7 @@ void state_menu() {
 	}
 	mmc3_disable_irq();
 
+	if (joypad1.select) nestopia = 1;
 
 	if (LEVELCOMPLETE[0] && 
 	LEVELCOMPLETE[1] && 
@@ -738,7 +748,7 @@ void state_menu() {
 	if (!NTSC_SYS) multi_vram_buffer_horz(palsystem, sizeof(palsystem)-1, NTADR_A(9,7));
 	//mmc3_set_prg_bank_1(GET_BANK(state_menu));
 
-	if (kandotemp == 0) music_play(song_menu_theme);
+	if (kandotemp == 0 && !nestopia) music_play(song_menu_theme);
 	kandotemp = 1;
 
 	settingvalue = 0;
@@ -844,11 +854,11 @@ void state_menu() {
 					break;
 				case 2:		//mini cube
 					title_cube_shit();
-					mini = 1;
+					mini[0] = 1;
 					high_byte(player_x[0]) = currplayer_x_small;
 					high_byte(player_y[0]) = currplayer_y_small;
 					crossPRGBankJump0(drawplayerone);
-					mini = 0;
+					mini[0] = 0;
 					break;
 				case 3:		//ship
 					title_ship_shit();
@@ -990,15 +1000,15 @@ void state_menu() {
 					title_wave_shit();
 					
 					if (currplayer_y_small == 160 || currplayer_y_small == 8) {
-						tmp1 = 0x17;
+						tmp1 = 0x29;
 						tmp2 = 0x20;
 					}
 					else if (currplayer_gravity) {
-						tmp1 = 0x3B;
+						tmp1 = 0x2D;
 						tmp2 = 0xA0;
 					}
 					else {
-						tmp1 = 0x3B;
+						tmp1 = 0x2D;
 						tmp2 = 0x20;
 					}
 					oam_spr(currplayer_x_small, currplayer_y_small, tmp1, tmp2);
@@ -1077,7 +1087,7 @@ void state_menu() {
 					title_ball_shit();
 					if (retro_mode && currplayer_gravity) tmp7 = 0xA0;
 					else tmp7 = 0x20;					
-					oam_spr(currplayer_x_small, currplayer_y_small, 0x0B, tmp7);
+					oam_spr(currplayer_x_small, currplayer_y_small, 0x3D, tmp7);
 					break;	
 				case 11:		//mini wave
 					title_mini_wave_shit();
@@ -1108,7 +1118,7 @@ void state_menu() {
 
 					if (!(kandoframecnt & 0x07)) ballframe += ballframe == 2 ? -2 : 1;
 
-					tmp2 = 0x13 + (ballframe * 2);
+					tmp2 = 0x37 + (ballframe * 2);
 
 					oam_spr(currplayer_x_small, currplayer_y_small, tmp2, 0x20);
 					break;
@@ -1356,7 +1366,7 @@ void state_menu() {
 
 void leveldec() {
 	--level;
-	if (level == 0x0B) level = 0x0A;	//THEORY OF EVERYTHING SKIP
+	//if (level == 0x0B) level = 0x0A;	//THEORY OF EVERYTHING SKIP
 	low_byte(tmp8) = 0xff;
 	tmp4 = 0;
 	if (!normalorcommlevels) {
@@ -1374,7 +1384,7 @@ void leveldec() {
 
 void levelinc() {
 	++level;
-	if (level == 0x0B) level = 0x0C;	//THEORY OF EVERYTHING SKIP
+	//if (level == 0x0B) level = 0x0C;	//THEORY OF EVERYTHING SKIP
 	low_byte(tmp8) = 0xff;
 	tmp4 = 1;
 	if (!normalorcommlevels) {
@@ -1416,10 +1426,10 @@ void set_title_icon() {
 			tmp7 += 38;
 			mmc3_set_2kb_chr_bank_0(retro_mode ? 16 : tmp7);
 		}
-		else if (titlemode <= 7) {
+		else if ((titlemode <= 7 && titlemode != 6) || titlemode == 13 || titlemode == 10) {
 			mmc3_set_2kb_chr_bank_0(retro_mode == 0 ? 18 : 20);	
 		}
-		else if (titlemode <= 15) {
+		else if ((titlemode <= 15 && titlemode != 13) || titlemode == 6) {
 			mmc3_set_2kb_chr_bank_0(retro_mode == 0 ? 22 : 24);		
 		}
 }			

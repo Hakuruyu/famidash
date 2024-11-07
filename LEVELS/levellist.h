@@ -42,7 +42,7 @@
 #define BLOCKSC 8
 #define BLOCKSD 10
 #define SAWBLADESA 12
-#define LETTERBANK 96
+#define LETTERBANK 98
 
 #define DECO1 26
 #define DECOCLOUD 30
@@ -65,6 +65,7 @@ const uint8_t DECOTYPE[] = {
 	DECO1, //LEVEL EASY
 	DECO1, //LIGHTNING ROAD
 	DECOCLOUD, //NIGHTMARE
+	DECO1, //DEMON PARK
 	DECOCLOUD, //DECODE
 	EXTRASPRITES1, //EON
 	DECOCLOUD, //lucky draw
@@ -92,6 +93,7 @@ const unsigned char spike_set[] = {
 	SPIKESA, //LEVEL EASY
 	SPIKESA, //lightning road
 	SPIKESB, //nightmare
+	SPIKESB, //demon park
 	SPIKESB, //decode
 	SPIKESB, //eon
 	SPIKESB, //lucky draw
@@ -119,6 +121,7 @@ const unsigned char block_set[] = {
 	BLOCKSA, //LEVEL EASY
 	BLOCKSA, //LIGHTNING ROAD
 	BLOCKSC, //nightmare
+	BLOCKSB, //demon park
 	BLOCKSB, //decode
 	BLOCKSA, //EON
 	BLOCKSB, //lucky draw
@@ -146,6 +149,7 @@ const unsigned char saw_set[] = {
 	SAWBLADESA, //LEVEL EASY
 	SAWBLADESA, //LIGHTNING ROAD
 	SAWBLADESA, //nightmare
+	SAWBLADESA, //demon park
 	SAWBLADESA, //decode
 	SAWBLADESA, //EON
 	LETTERBANK, //lucky draw
@@ -174,6 +178,7 @@ const unsigned char difficulty_list[] = {
     NORMAL, //LEVEL EASY
     DEMON, //lightning road
     DEMON, //nightmare
+    DEMON, //demon park
     DEMON, //decode
     DEMON, //eon
     DEMON, //lucky draw
@@ -204,6 +209,7 @@ const unsigned char stars_list[] = {
 	10,
 	10,
 	10,
+	10,
 	0,
 	0,
 	0,
@@ -228,7 +234,7 @@ const unsigned char colors_list[] = {
 
 
 static const uint8_t iconTable[] = {
-	0, 0x02, 0x04, 0x06, 0x08, 0x0A, 0x0C, 0x0E, 0x20, 0x22, 0x24, 0x26, 0x40, 0x42, 0x44, 0x46, 0x48, 0x4A, 0x4C, 0x4E, 0x60, 0x62, 0x64, 0x66, 0x68, 0x6A, 0x6C
+	0, 0x02, 0x04, 0x06, 0x08, 0x0A, 0x0C, 0x0E, 0x20, 0x22, 0x24, 0x26, 0x40, 0x42, 0x44, 0x46, 0x48, 0x4A, 0x4C, 0x4E, 0x60, 0x62, 0x64, 0x66, 0x68, 0x6A, 0x6C, 0x6E
 };
 
 

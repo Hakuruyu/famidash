@@ -60,6 +60,7 @@ void state_game(){
 	kandokidshack = 0;
 	kandokidshack2 = 0;
 	kandokidshack3 = 0;
+	kandokidshack4 = 0;
 	animating = 0;
 	memfill(trail_sprites_visible, 0, sizeof(trail_sprites_visible));
 	orbactive = 0;
@@ -168,9 +169,19 @@ void state_game(){
 		}
 
 		kandoframecnt++;
-		music_update();
-		if (slowmode && (kandoframecnt & 1)) { ppu_wait_nmi(); }
+		if ((slowmode || (kandokidshack4 == 15)) && (kandoframecnt & 1)) { ppu_wait_nmi(); 
+			if (!(kandokidshack4 == 15)) music_update();
+//			oam_clear();
+//			mmc3_set_prg_bank_1(GET_BANK(draw_screen));
+//			draw_screen(); 
+//			mmc3_set_prg_bank_1(GET_BANK(draw_sprites));	
+//			draw_sprites();
+			if ((controllingplayer->press_a || controllingplayer->press_up) && currplayer_vel_y != 0) idx8_store(cube_data, currplayer, cube_data[currplayer] | 0x02);
+			crossPRGBankJump0(sprite_collide);
+
+		}
 		else {
+			music_update();
 			ppu_wait_nmi();
 
 			// set_tile_banks();
@@ -201,7 +212,7 @@ void state_game(){
 				dual = 1;
 			}
 			
-			if (!(joypad1.a)) {
+			if (!(joypad1.a) && !(joypad1.up)) {
 				if (dashing[0]) currplayer_vel_y = 0x0100^(0x0000 - currplayer_gravity);
 				dashing[0] = 0;
 			}
@@ -229,7 +240,7 @@ void state_game(){
 			//end mouse debug
 			
 			if (options & jumpsound) {
-				if (joypad1.press_a) {
+				if (joypad1.press_a || joypad1.press_up) {
 					sfx_play(sfx_click, 0);
 				}
 			}
@@ -249,6 +260,7 @@ void state_game(){
 				// vram_unrle(pausescreen); 	
 				// ppu_on_all();
 				kandokidshack3 = 0;
+				kandokidshack4 = 0;
 				while (!(joypad1.press & PAD_START) && !(mouse.right_press)) {
 					if (VRAM_UPDATE == 1) {
 						ppu_wait_nmi();
@@ -260,6 +272,9 @@ void state_game(){
 					else exittimer = 0;
 					if ((joypad1.up) && (joypad1.press_b)) {
 						kandokidshack3++;
+					}
+					if ((joypad1.down) && (joypad1.press_b)) {
+						kandokidshack4++;
 					}
 
 					else if ((controllingplayer->press_b || mouse.left_press) && PRACTICE_ENABLED) {
@@ -326,12 +341,12 @@ void state_game(){
 		
 		if ((controllingplayer->press_b) && has_practice_point && !(twoplayer && (options & oneptwoplayer))) crossPRGBankJump0(reset_game_vars);
 
-		if (joypad1.press_up && DEBUG_MODE) {
+		if (joypad1.press_right && DEBUG_MODE && !(options & platformer)) {
 			currplayer_gravity ^= 0x01;
 		}
 		
 		if (joypad1.press_down && DEBUG_MODE) {
-			mini ^= 1;
+			currplayer_mini ^= 1;
 		}
 
 		if (joypad1.select && DEBUG_MODE) {
@@ -351,6 +366,14 @@ void state_game(){
 		if (was_on_slope_counter) {
 			was_on_slope_counter--;
 		} else slope_type = 0;
+
+		if ((controllingplayer->press_a || controllingplayer->press_up) && currplayer_vel_y != 0) idx8_store(cube_data, currplayer, cube_data[currplayer] | 0x02);
+
+	if (orbed[currplayer]) {
+		if (!(controllingplayer->a) && !(controllingplayer->up)) orbed[currplayer] = 0;
+	}
+
+		crossPRGBankJump0(sprite_collide);
 
 		crossPRGBankJump0(movement);
 
@@ -422,12 +445,13 @@ void state_game(){
 			player_vel_x[0] = currplayer_vel_x;
 			player_vel_y[0] = currplayer_vel_y;
 			player_gravity[0] = currplayer_gravity;
+			mini[0] = currplayer_mini;
 		}
 
 		
 		if (dual) { 
 			currplayer = 1;					//take focus
-			if (!(joypad2.a)) {
+			if (!(joypad2.a) && !(joypad2.up)) {
 				if (dashing[1]) currplayer_vel_y = 0x0100^(0x0000 - currplayer_gravity);
 				dashing[1] = 0;
 			}
@@ -441,9 +465,16 @@ void state_game(){
 				currplayer_vel_x = player_vel_x[1];
 				currplayer_vel_y = player_vel_y[1];
 				currplayer_gravity = player_gravity[1];
+				currplayer_mini = mini[1];
 			}
 
-			if (controllingplayer->press_up && DEBUG_MODE) currplayer_gravity ^= 0x01;			//DEBUG GRAVITY
+			if (controllingplayer->press_right && DEBUG_MODE && !(options & platformer)) currplayer_gravity ^= 0x01;			//DEBUG GRAVITY
+			if (((controllingplayer->press_a || controllingplayer->press_up)) && currplayer_vel_y != 0) idx8_store(cube_data, currplayer, cube_data[currplayer] | 0x02);
+	if (orbed[currplayer]) {
+		if (!(controllingplayer->a) && !(controllingplayer->up)) orbed[currplayer] = 0;
+	}
+
+			crossPRGBankJump0(sprite_collide);
 
 			crossPRGBankJump0(movement);
 
@@ -451,7 +482,7 @@ void state_game(){
 			runthecolls();
 			kandotemp3 = 0;
 			
-			crossPRGBankJump0(do_the_scroll_thing2);
+	//		crossPRGBankJump0(do_the_scroll_thing2);
 
 			currplayer = 0;					//give back focus
 
@@ -463,12 +494,14 @@ void state_game(){
 				player_vel_x[1] = currplayer_vel_x;
 				player_vel_y[1] = currplayer_vel_y;
 				player_gravity[1] = currplayer_gravity;
+				mini[1] = currplayer_mini;
 
 				currplayer_x = player_x[0];
 				currplayer_y = player_y[0];
 				currplayer_vel_x = player_vel_x[0];
 				currplayer_vel_y = player_vel_y[0];
 				currplayer_gravity = player_gravity[0];
+				currplayer_mini = mini[0];
 			}
 		}
 
@@ -508,7 +541,7 @@ void runthecolls() {
 		x_movement();
 	}	
 
-	crossPRGBankJump0(sprite_collide);
+
 
 	if (!DEBUG_MODE && !invincible_counter) {
 		crossPRGBankJump0(bg_coll_death);
@@ -524,7 +557,7 @@ void set_player_banks() {
 		}
 		
 		if (gamemode == 8) mmc3_set_2kb_chr_bank_0(NINJABANK);
-		else if ((mini && gamemode != 0) || (gamemode == 7)) mmc3_set_2kb_chr_bank_0(iconbank2);
+		else if ((currplayer_mini && (gamemode != 0 && gamemode != 2 && gamemode != 4)) || (gamemode == 7) || (gamemode == 6)) mmc3_set_2kb_chr_bank_0(iconbank2);
 		else if (gamemode == 0 || gamemode == 1 || gamemode == 3) mmc3_set_2kb_chr_bank_0(iconbank3);
 		else mmc3_set_2kb_chr_bank_0(iconbank1);
 

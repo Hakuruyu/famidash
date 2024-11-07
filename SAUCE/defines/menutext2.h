@@ -30,7 +30,7 @@ const unsigned char level8text2[]="TIME MACHINE";
 const unsigned char level9text2[]="CYCLES";
 const unsigned char levelAtext2[]="XSTEP";
 const unsigned char levelBtext2[]="CLUTTERFUNK";
-const unsigned char levelCtext2[]="UNFINISHED";
+const unsigned char levelCtext2[]="EVERYTHING";
 const unsigned char levelDtext2[]="ADVENTURES";
 const unsigned char levelEtext2[]="THE NIGHTMARE";
 const unsigned char levelFtext2[]="DECODE";
@@ -43,4 +43,5 @@ const unsigned char level15text2[]="LEVEL EASY";
 const unsigned char level16text2[]="ROAD";
 const unsigned char level17text2[]="EON";
 const unsigned char level18text2[]="THE SAFE LEVELS";
+const unsigned char level19text2[]="DEMON PARK";
 
