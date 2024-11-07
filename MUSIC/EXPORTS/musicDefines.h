@@ -14,7 +14,7 @@
 #define song_cant_let_go 13
 #define song_xstep 14
 #define song_theory_of_everything 15
-#define song_custom_atthespeedoflight 16
+#define song_eon 16
 #define song_max 17
 #define sfx_death 0
 #define sfx_click 1
