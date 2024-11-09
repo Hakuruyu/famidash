@@ -21,12 +21,12 @@
 	.export __scroll,_split,_newrand
 	.export _bank_spr
 	.export __vram_read,__vram_write
-	.export _rand16,_set_rand
+	.export _set_rand
 	.export __vram_fill,_vram_inc,_vram_unrle
 	.export __memcpy,__memfill,_delay
 	
 	.export _flush_vram_update2, _oam_set, _oam_get
-	.import _disco_sprites, _slowmode, _kandoframecnt
+	.import _disco_sprites, _slowmode, _kandoframecnt, _kandokidshack4, _pauseStatus
 	.segment "NESLIB"
 
 ;NMI handler
@@ -111,8 +111,15 @@ nmi:
                    ; so goes before the music
             ; but, if screen is off this should be skipped
   
+  
+  lda _pauseStatus
+  bne @calc
+  lda _kandokidshack4
+  cmp #$0f
+  beq @calc2
   lda _slowmode
   beq @calc
+@calc2:
   lda _kandoframecnt
   and #$01
   bne @skipAll
@@ -124,9 +131,6 @@ nmi:
   ; DMC DMA bugs
   jsr oam_and_readjoypad
 
-
-
-
   lda <(mouse + kMouseButtons)
   and #$0f
   cmp #$01
@@ -134,11 +138,9 @@ nmi:
 @SkipMouse:
 	LDA #>OAM_BUF
   	STA PPU_OAM_DMA
+	sta noMouse ; it checks for non zero, not just 1
 	lda <joypad1
 	sta TEMP + 4
-	lda #$01
-	sta noMouse
-	lda #$00
     jsr _pad_poll
   :
   ; Calculate the press/release for the controllers
@@ -928,7 +930,7 @@ __vram_write:
 ;uint8_t __fastcall__ pad_poll(uint8_t pad);
 
 _pad_poll:
-	tay
+	ldy #$00
 	ldx #3
 @padPollPort:
 	lda #1
@@ -1041,13 +1043,13 @@ rand2:
 
 ;uint16_t __fastcall__ rand16();
 
-_rand16:
+;_rand16:
 
-	jsr rand1
-	tax
-	jsr rand2
+;	jsr rand1
+;	tax
+;	jsr rand2
 
-	rts
+;	rts
 
 
 ;void __fastcall__ set_rand(uint8_t seed);
