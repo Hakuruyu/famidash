@@ -14,7 +14,7 @@
 
 ; Linker generated symbols
 	.import __C_STACK_START__, __C_STACK_SIZE__
-	.import __PAL_BUF_START__, __OAM_BUF_START__, __VRAM_BUF_START__
+	.import __PAL_BUF_START__, __OAM_BUF_START__, __VRAM_BUF_START__, __INST_BUF_START__
 	.import	__CODE_LOAD__   ,__CODE_RUN__   ,__CODE_SIZE__
 	.import	__RODATA_LOAD__ ,__RODATA_RUN__ ,__RODATA_SIZE__
 
@@ -25,6 +25,7 @@ VRAM_BUF=__VRAM_BUF_START__
 OAM_BUF=__OAM_BUF_START__
 PAL_BUF_RAW=__PAL_BUF_START__
 PAL_BUF=PAL_BUF_RAW+$20
+INST_BUF=__INST_BUF_START__
 
 SFX_STRINGS = 0
 
@@ -58,7 +59,7 @@ NTSC_MODE: 			.res 1
 FRAME_CNT1: 		.res 1
 FRAME_CNT2: 		.res 1
 VRAM_UPDATE: 		.res 1
-; NAME_UPD_ADR: 		.res 2
+NAME_UPD_PTR: 		.res 2
 NAME_UPD_ENABLE: 	.res 1
 PAL_UPDATE: 		.res 1
 ; PAL_BG_PTR: 		.res 2
@@ -109,6 +110,9 @@ VRAM_INDEX:			.res 1
 
 xargs:				.res 4
 noMouse:			.res 1
+
+buf_curSeqMode: .res 1		; $00 - horizontal, $80 - vertical
+buf_instIdx: .res 1
 
  
 ;
