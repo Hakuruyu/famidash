@@ -102,8 +102,8 @@ if __name__ == "__main__":
 	parser.add_argument("input", nargs=argparse.REMAINDER)
 	args = parser.parse_args()
 
-	ownPath = pathlib.Path(sys.path[0]).resolve()
+	rootPath = pathlib.Path(sys.path[0]).parent.resolve()
 	for filename in args.input:
-		realFilename = ownPath / filename
-		outFilename = ownPath / "TMP" / (realFilename.stem+".s")
+		realFilename = rootPath / filename
+		outFilename = rootPath / "TMP" / (realFilename.stem+".s")
 		convertCFileToS(realFilename, outFilename)

@@ -49,13 +49,13 @@ def readCfgFile (filename : pathlib.Path) -> dict:
 
 	return outdict
 
-ownPath = pathlib.Path(sys.path[0]).resolve()
+rootPath = pathlib.Path(sys.path[0]).parent.resolve()
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-d", "--only-diff", "--diff-only", help="Only show the differences between the .dbg files", action="store_false", default=True)
 parser.add_argument("-m", "--markdown-mode", "--md", help="Enable markdown code quotes around individual entries", action="store_true")
 parser.add_argument("-e", "--entry-type", help="The type of entries to include", default="scope", choices=["scope", "seg", "bank"])
-parser.add_argument("-f", "--file", help="Specify a path of the new famidash.dbg file, the default is BUILD/famidash.dbg", type=pathlib.Path, default = ownPath / "BUILD" / "famidash.dbg")
+parser.add_argument("-f", "--file", help="Specify a path of the new famidash.dbg file, the default is BUILD/famidash.dbg", type=pathlib.Path, default = rootPath / "BUILD" / "famidash.dbg")
 parser.add_argument("-c", "--compare", help="Compare the current BUILD/famidash.dbg file to an older version of the famidash.dbg file", type=pathlib.Path)
 parser.add_argument("-s", "--sort", help="Sorting options", default="declaration", choices=
 					["declaration", "d", "alphabetical", "a", "size-increasing", "si", "size-decreasing", "sd"])
@@ -93,7 +93,7 @@ if compare:
 			old[i[0]] = 0
 
 if args.entry_type == "bank":
-	cfgData = readCfgFile(ownPath / "CONFIG" / "mmc3.cfg")
+	cfgData = readCfgFile(rootPath / "CONFIG" / "mmc3.cfg")
 	cfg = {}
 	for segment in cfgData['SEGMENTS']:
 		cfg[segment] = cfgData['SEGMENTS'][segment]['load']

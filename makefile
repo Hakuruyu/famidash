@@ -73,16 +73,19 @@ $(TMPDIR)/crt0.o: GRAPHICS/*.chr LIB/asm/*.s LEVELS/*.s METATILES/*.s METATILES/
 $(TMPDIR)/$(NAME).o: $(TMPDIR)/$(NAME).s
 	$(CA65) -l $(OUTDIR)/$(NAME).lst --cpu 6502X $(call ca65IncDir,LIB/asm) $(TMPDIR)/$(NAME).s -g 
 
-$(TMPDIR)/BUILD_FLAGS.s: BUILD_FLAGS.h defines_to_asm.py
-	$(PYTHON) defines_to_asm.py BUILD_FLAGS.h
+$(TMPDIR)/BUILD_FLAGS.s: BUILD_FLAGS.h UTILS/defines_to_asm.py
+	$(PYTHON) UTILS/defines_to_asm.py BUILD_FLAGS.h
 
-$(TMPDIR)/C_defines.s: SAUCE/defines/*_defines.h defines_to_asm.py
-	$(PYTHON) defines_to_asm.py SAUCE/defines/space_defines.h SAUCE/defines/physics_defines.h SAUCE/defines/level_defines.h
+$(TMPDIR)/C_defines.s: SAUCE/defines/*_defines.h UTILS/defines_to_asm.py
+	$(PYTHON) UTILS/defines_to_asm.py SAUCE/defines/space_defines.h SAUCE/defines/physics_defines.h SAUCE/defines/level_defines.h
 	$(CAT) $(TMPDIR)$(DS)space_defines.s $(TMPDIR)$(DS)physics_defines.s $(TMPDIR)$(DS)level_defines.s > $(TMPDIR)$(DS)C_defines.s
 
 $(TMPDIR)/$(NAME).s: $(TMPDIR) SAUCE/$(NAME).c SAUCE/*.h SAUCE/gamestates/*.h SAUCE/gamemodes/*.h SAUCE/defines/*.h SAUCE/functions/*.h METATILES/metatiles.h LEVELS/*.h LIB/headers/*.h MUSIC/EXPORTS/*.h 
 	$(CC65) -Osir -g --eagerly-inline-funcs SAUCE/$(NAME).c $(call cc65IncDir,LIB/headers) $(call cc65IncDir,.) -E --add-source -o $(TMPDIR)/$(NAME).c
 	$(CC65) -Osir -g --eagerly-inline-funcs SAUCE/$(NAME).c $(call cc65IncDir,LIB/headers) $(call cc65IncDir,.) --add-source -o $(TMPDIR)/$(NAME).s
+
+SAUCE/defines/physics_table_defines.cmp.h: SAUCE/defines/physics_table_defines.txt UTILS/compileVarTables.py
+	$(PYTHON) UTILS/compileVarTables.py SAUCE/defines/physics_table_defines.txt
 
 $(TMPDIR)/$(NAME)_prg.bin $(TMPDIR)/$(NAME)_nsfprg.bin $(TMPDIR)/$(NAME)_meta.bin $(TMPDIR)/$(NAME)_hdr.bin: $(OUTDIR) $(TMPDIR)/$(NAME).o $(TMPDIR)/crt0_nsf.o $(NSF_CFG)
 	$(LD65) -C $(NSF_CFG) -o $(TMPDIR)/$(NAME) $(call ld65IncDir,$(TMPDIR)) $(call ld65IncDir,LIB) crt0_nsf.o $(NAME).o nes.lib --dbgfile $(OUTDIR)/famidash_nsf.dbg
