@@ -62,7 +62,7 @@ def generateCArrayLine(source : dict, numTable : tuple[int], byteIdx : int, suff
 	if bytesEqual(numTable, byteIdx):
 		return f"#define {source['name']}{suffix} 0x{getByte(numTable[0], byteIdx):02X}"
 	else:
-		return f"const uint8_t {source['name']}{suffix}[] = {{{", ".join(f"0x{getByte(i, byteIdx):02X}" for i in numTable)}}};"
+		return f"const uint8_t {source['name']}{suffix}[] = {{{", ".join(f'0x{getByte(i, byteIdx):02X}' for i in numTable)}}};"
 
 def generateCArgumentDefine(source : dict, numTable : tuple[int], suffixes : tuple[str] | list[str], argument : str) -> str:
 	output = [f"__A__ = {argument}", '__asm__("tay")']
@@ -83,7 +83,7 @@ def generateCArgumentDefine(source : dict, numTable : tuple[int], suffixes : tup
 
 	output.append(f'__asm__("ldx {arg[1]} \\n lda {arg[0]}", {val[1]}, {val[0]})')
 	output.append('__EAX__' if size > 16 else '__AX__')
-	output = f"( \\\n\t{", \\\n\t".join(output)} \\\n)"
+	output = f'( \\\n\t{", \\\n\t".join(output)} \\\n)'
 	return output
 
 def generateCTable(source : dict) -> str:
@@ -134,9 +134,9 @@ def generateCTable(source : dict) -> str:
 			outString.append(generateCArrayLine(source, numTable, byte, suffix))
 		
 		if any([bytesEqual(numTable, i) for i in range(size // 8)]):
-			outString.append(f"#define {source['name']}({argument}) {generateCArgumentDefine(source, numTable, suffixes, argument)}")
+			outString.append(f'#define {source["name"]}({argument}) {generateCArgumentDefine(source, numTable, suffixes, argument)}')
 		else:
-			outString.append(f"#define {source['name']}({argument}) (lohi_arr{size}_load({source['name']}, {argument}))")
+			outString.append(f'#define {source["name"]}({argument}) (lohi_arr{size}_load({source["name"]}, {argument}))')
 
 		return "\n".join(outString)
 	print(f"Table integer size {size} is invalid! Full table: {numTable}, happened with {source}")
