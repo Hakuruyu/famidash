@@ -82,7 +82,7 @@ if compare:
 	oldDbgData = readDbgFile(args.compare, check)
 	old = {i['name'] : int(i['size'], base=0) for i in oldDbgData[check]}
 newDbgData = readDbgFile(args.file, check)
-new = {i['name'] : int(i['size'], base=0) for i in oldDbgData[check]}
+new = {i['name'] : int(i['size'], base=0) for i in newDbgData[check]}
 
 if compare:
 	for i in old.items():
