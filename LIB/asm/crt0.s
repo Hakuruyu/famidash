@@ -11,6 +11,7 @@
     .export _exit,__STARTUP__:absolute=1
 	.export _PAL_BUF := PAL_BUF, _PAL_UPDATE := PAL_UPDATE, _xargs := xargs
 	.export _PAL_BUF_RAW := PAL_BUF_RAW, _PAL_PTR := PAL_PTR
+	.export _framerate := framerate, _cpuRegion := cpuRegion
 	.import push0,popa,popax,_main
 
 ; Linker generated symbols
@@ -56,8 +57,7 @@ CTRL_PORT2	=$4017
 .segment "ZEROPAGE"
 
 NTSC_MODE: 			.res 1
-FRAME_CNT1: 		.res 1
-FRAME_CNT2: 		.res 1
+FRAME_CNT: 			.res 1
 VRAM_UPDATE: 		.res 1
 ; NAME_UPD_ADR: 		.res 2
 NAME_UPD_ENABLE: 	.res 1
@@ -111,6 +111,9 @@ VRAM_INDEX:			.res 1
 xargs:				.res 4
 noMouse:			.res 1
 
+framerate:			.res 1	;	0 = ~60Hz (NTSC), 1 = ~50Hz (PAL, Dendy)
+cpuRegion:			.res 1	;	0 = NTSC speed (also on Dendy), 1 = PAL speed
+
  
 ;
 ; NES 2.0 header
@@ -153,14 +156,87 @@ _exit:
     stx DMC_FREQ
     stx PPU_CTRL		;no NMI
 
-initPPU:
-    bit PPU_STATUS
+initPPU_first:		;
+    bit PPU_STATUS	;
+@1:					;	Wait out the first frame
+    bit PPU_STATUS	;
+    bpl @1			;__
+
+; We now have about 30,000 cycles to burn before the PPU stabilizes.
+; One thing we can do with this time is put RAM in a known state.
+; Here we fill it with $00, which matches what (say) a C compiler
+; expects for BSS.  Conveniently, X is still 0.
+
+clearRAM:
+    txa
+@1:
+    sta $00,x   ;
+    sta $0100,x ;
+    sta $0200,x ;
+    sta $0300,x ;   Clear regular NES RAM
+    sta $0400,x ;
+    sta $0500,x ;
+    sta $0600,x ;
+    sta $0700,x ;__
+	sta $6000,x ;
+	sta $6100,x ;   Clear the collision map space
+    sta $6200,x ;
+	sta $6300,x ;__
+    inx
+    bne @1
+
+    sta	framerate
+    sta	cpuRegion
+
+	jsr initialize_mapper
+
+    ; jsr	zerobss	; Unnecessary, we already zeroed out the entire memory
+	jsr	copydata	; Sets all the initial values of variables
+
+    lda #<(__C_STACK_START__+__C_STACK_SIZE__) ;changed
+    sta	sp
+    lda	#>(__C_STACK_START__+__C_STACK_SIZE__)
+    sta	sp+1            ; Set argument stack ptr
+
+	; jsr	initlib	; removed. this called the CONDES function
+
+init_famistudio:
+	LDA #<-1			;   Do famistudio_init
+    JSR _music_play		;__
+
+    LDA #<.bank(sounds)
+    JSR mmc3_tmp_prg_bank_1
+    
+	ldx #<sounds
+	ldy #>sounds
+	jsr famistudio_sfx_init
+
+init_rng:
+	lda $60FC
+	beq @fallback
+	sta <RAND_SEED
+	lda $60FD
+	beq @fallback
+	sta <RAND_SEED+1
+	lda $60FE
+	beq @fallback
+	sta <RAND_SEED+2
+	lda $60FF
+	beq @fallback
+	sta <RAND_SEED+3
+    bne @done
+@fallback:
+	lda #$FD
+	sta <RAND_SEED
+	sta <RAND_SEED+1
+	sta <RAND_SEED+2
+	sta <RAND_SEED+3
+@done:
+
+initPPU_second:
 @1:
     bit PPU_STATUS
     bpl @1
-@2:
-    bit PPU_STATUS
-    bpl @2
 
 clearPalette:
 	lda #$3f
@@ -186,41 +262,10 @@ clearVRAM:
 	dey
 	bne @1
 
-clearRAM:
-    txa
-@1:
-    sta $00,x   ;
-    sta $0100,x ;
-    sta $0200,x ;
-    sta $0300,x ;   Clear regular NES RAM
-    sta $0400,x ;
-    sta $0500,x ;
-    sta $0600,x ;
-    sta $0700,x ;__
-	sta $6000,x ;
-	sta $6100,x ;   Clear the collision map space
-    sta $6200,x ;
-	sta $6300,x ;__
-    inx
-    bne @1
-
-
 	lda #4
 	jsr _pal_bright
 	jsr _pal_clear
 	jsr _oam_clear
-
-	jsr initialize_mapper
-
-    ; jsr	zerobss	; Unnecessary, we already zeroed out the entire memory
-	jsr	copydata	; Sets all the initial values of variables
-
-    lda #<(__C_STACK_START__+__C_STACK_SIZE__) ;changed
-    sta	sp
-    lda	#>(__C_STACK_START__+__C_STACK_SIZE__)
-    sta	sp+1            ; Set argument stack ptr
-
-	; jsr	initlib	; removed. this called the CONDES function
 
 	lda #%10100000
 	sta <PPU_CTRL_VAR
@@ -228,61 +273,16 @@ clearRAM:
 	lda #%00000110
 	sta <PPU_MASK_VAR
 
-waitSync3:
-	lda <FRAME_CNT1
-@1:
-	cmp <FRAME_CNT1
-	beq @1
-
-detectNTSC:
-	ldx #52				;blargg's code
-	ldy #24
-@1:
-	dex
-	bne @1
-	dey
-	bne @1
-
-	lda PPU_STATUS
-	and #$80
-	sta <NTSC_MODE
+	jsr	getTVSystem	;__	0 = NTSC, 1 = PAL, 2 = Dendy, 3 = unknown
+	cmp	#1			;	Set framerate to 1 if value > NTSC
+	rol	framerate	;__	(so PAL, Dendy and unknown)
+	and	#1			;	Set framerate to the last bit of the value
+	sta	cpuRegion	;__	(so 0 = NTSC / Dendy, 1 = PAL / unknown)
+	;__	As a result of the code above, an unknown region will behave like PAL
 
 	jsr _ppu_off
 
-	; lda #0
-	; ldx #0
-	; jsr _set_vram_update
-
-	LDA #<-1			;   Do famistudio_init
-    JSR _music_play		;__
-
-    LDA #<.bank(sounds)
-    JSR mmc3_tmp_prg_bank_1
-    
-	ldx #<sounds
-	ldy #>sounds
-	jsr famistudio_sfx_init
-
-	lda $60FC
-	beq @fallback
-	sta <RAND_SEED
-	lda $60FD
-	beq @fallback
-	sta <RAND_SEED+1
-	lda $60FE
-	beq @fallback
-	sta <RAND_SEED+2
-	lda $60FF
-	beq @fallback
-	sta <RAND_SEED+3
-        bne @done
-@fallback:
-	lda #$FD
-	sta <RAND_SEED
-	sta <RAND_SEED+1
-	sta <RAND_SEED+2
-	sta <RAND_SEED+3
-@done:
+finish:
 	lda #0
 	sta PPU_SCROLL
 	sta PPU_SCROLL
@@ -290,6 +290,8 @@ detectNTSC:
     cli
 
 	jmp _main			;no parameters
+
+	.include "get_tv_system.s"
 
 	.include "METATILES/metatiles.s"
 

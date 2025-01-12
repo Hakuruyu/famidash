@@ -1811,7 +1811,8 @@ found_bank:
 			LDA	music_data_locations_hi-FIRST_MUSIC_BANK, Y
 			TAY
 		.endif
-        LDA NTSC_MODE
+        LDA cpuRegion
+        EOR	#1
         JSR famistudio_init
     :
     PLA
@@ -2625,7 +2626,7 @@ drawplayer_center_offsets:
 		TAY					;__
 
 		; ; CENTERING DEBUGGING ONLY
-		; lda <FRAME_CNT1
+		; lda <FRAME_CNT
 		; and #$01
 		; beq :+
 		; 	lda #$40
@@ -3172,8 +3173,8 @@ drawplayer_common := _drawplayerone::common
 PCM_ptr = ptr1
     ; A = Sample
 	tay
-	ldx	NTSC_MODE
-	bne :+
+	ldx	cpuRegion
+	beq :+
 		clc
 		adc #(SampleRate_PAL-SampleRate_NTSC)
 	:
@@ -4052,7 +4053,7 @@ vert_skip:
 
 .export _update_currplayer_table_idx
 .proc _update_currplayer_table_idx
-	LDA	NTSC_MODE	; CURRENTLY INCORRECT, REQUIRES NEW INIT CODE
+	LDA	framerate
 	ASL
 	ORA	_currplayer_mini
 	BIT	_currplayer_gravity	;	Put gravity into Carry
