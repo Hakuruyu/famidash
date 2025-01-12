@@ -49,8 +49,6 @@ void main(){
     // ppu_on_all();
     // pal_fade_to(4,0);
 
-	// needed for cc65 to export the label for mesen
-    gameState = 0x01;
 	
 	// These are done at init time
     // level = 0x00;
@@ -63,61 +61,58 @@ void main(){
 	pal_spr(paletteDefaultSP);
 	menuMusicCurrentlyPlaying = 0;
 	crossPRGBankJump0(gameboy_check);
+	
+	// needed for cc65 to export the label for mesen
 	gameState = 0x05;
     while (1){
 		ppu_wait_nmi();
 		switch (gameState){
-			case 0x01: {
+			case STATE_MENU: {
 				mmc3_set_prg_bank_1(GET_BANK(state_menu));
-				if (!kandowatchesyousleep) state_menu();
-				else {
-					pal_fade_to_withmusic(4,0);
-					ppu_off();
-					pal_bg(splashMenu);
-					kandowatchesyousleep = 1;
-
-					//
-					practice_point_count = 0;
-					#include "defines/mainmenu_charmap.h"
-					levelselection();
-				}
+				state_menu();
 				break;
 			}
-			case 0x02: {
+			case STATE_GAME: {
+				practice_point_count = 0; // temp location
 				state_game();
 				use_auto_chrswitch = 0;
 				break;
 			}
-			case 0x03: {
+			case STATE_LVLDONE: {
 				mmc3_set_prg_bank_1(GET_BANK(state_lvldone));
 				state_lvldone();
 				break;
 			}
-			case 0x04: {
+			case STATE_BGMTEST: {
 				mmc3_set_prg_bank_1(GET_BANK(bgmtest));
 				bgmtest();
 				break;
 			}
-			case 0x05: {
+			case STATE_SAVEFILE_VALIDATE: {
 				music_play(song_scheming_weasel);
 				mmc3_set_prg_bank_1(GET_BANK(state_savefile_validate));
 				state_savefile_validate();
 				break;
 			}
-			case 0x06: {
+			case STATE_SAVEFILE_EDITOR: {
 				mmc3_set_prg_bank_1(GET_BANK(state_savefile_editor));
 				state_savefile_editor();
 				break;
 			}
+			case STATE_LEVELSELECT: {
+				mmc3_set_prg_bank_1(GET_BANK(levelselection));
+				levelselection();
+				break;
+			}
 
 
-			case 0xF0: {
+			case STATE_FUNSETTINGS: {
 				mmc3_set_prg_bank_1(GET_BANK(funsettings));
 				funsettings();
 				break;
 			}
 
-			case 0xFE: {
+			case STATE_EXIT: {
 				mmc3_set_prg_bank_1(GET_BANK(state_exit));
 				state_exit();
 				break;

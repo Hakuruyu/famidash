@@ -338,7 +338,7 @@ void state_lvldone() {
 				if (mouse.y >= 0xC5 && mouse.y <= 0xE3) {
 					if (mouse.x >= 0x36 && mouse.x <= 0x53) {
 						sfx_play(sfx_start_level, 0);
-						gameState = 2;
+						gameState = STATE_GAME;
 						pal_fade_to_withmusic(4,0);
 						memfill(attemptCounter, 0, sizeof(attemptCounter));
 
@@ -349,9 +349,9 @@ void state_lvldone() {
 					if (mouse.x >= 0xA6 && mouse.x <= 0xc3) {
 						sfx_play(sfx_exit_level, 0);
 						music_update();
-						gameState = 1;
+						gameState = STATE_MENU;
 						menuselection = 0;
-						kandowatchesyousleep = 1;
+						gameState = STATE_LEVELSELECT;
 						//oam_clear();
 						menuMusicCurrentlyPlaying = 0;
 						return;
@@ -366,9 +366,8 @@ void state_lvldone() {
 					
 					sfx_play(sfx_exit_level, 0);
 					music_update();
-					gameState = 1;
+					gameState = STATE_LEVELSELECT;
 					menuselection = 0;
-					kandowatchesyousleep = 1;
 
 					//oam_clear();
 					menuMusicCurrentlyPlaying = 0;
@@ -376,7 +375,7 @@ void state_lvldone() {
 				} else {
 					
 					sfx_play(sfx_start_level, 0);
-					gameState = 2;
+					gameState = STATE_GAME;
 					pal_fade_to_withmusic(4,0);
 					memfill(attemptCounter, 0, sizeof(attemptCounter));
 					coins = 0;
@@ -748,7 +747,7 @@ void bgmtest() {
 			}
 			if ((mouse.x >= 0x56 && mouse.x <= 0xA5) && (mouse.y >= 0x24 && mouse.y <= 0x2B)) {		
 				code_checker();
-				if (gameState == 0xF0) return;
+				if (gameState == STATE_FUNSETTINGS) return;
 			}
 			if ((mouse.y >= 0x4E && mouse.y <= 0x5C)) {
 				if ((mouse.x >= 0x24 && mouse.x <= 0x2C)) {		
@@ -773,7 +772,7 @@ void bgmtest() {
 					one_vram_buffer(' ', NTADR_A(11, 7));
 					one_vram_buffer(' ', NTADR_A(11, 14));
 					menuMusicCurrentlyPlaying = 1;
-					gameState = 1;
+					gameState = STATE_MENU;
 					return;
 				}
 				else if (mouse.y >= 0x3D && mouse.y <= 0x64) {
@@ -822,7 +821,7 @@ void bgmtest() {
 			one_vram_buffer(' ', NTADR_A(11, 7));
 			one_vram_buffer(' ', NTADR_A(11, 14));
 			menuMusicCurrentlyPlaying = 1;
-			gameState = 1;
+			gameState = STATE_MENU;
 			return;
 		}
 
@@ -831,7 +830,7 @@ void bgmtest() {
 		// sound test codes
 		if (joypad1.press_start) {
 			code_checker();
-			if (gameState == 0xF0) return;
+			if (gameState == STATE_FUNSETTINGS) return;
 		}
 	}
 }
@@ -849,7 +848,7 @@ void code_checker() {
 	
 	else if (song == 1 && sfx == 7 && kandokidshack3 == 1) {
 		all_levels_complete = 0xFC;
-		gameState = 0xF0; // fun settings gamestate
+		gameState = STATE_FUNSETTINGS; // fun settings gamestate
 		tmp3--;
 	}		
 	else kandokidshack3 = 0;

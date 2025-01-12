@@ -1,7 +1,14 @@
 // game states
-#define MENU 0x01
-#define GAME 0x02
-
+#define STATE_DEMO 0x00
+#define STATE_MENU 0x01
+#define STATE_GAME 0x02
+#define STATE_LVLDONE 0x03
+#define STATE_BGMTEST 0x04
+#define STATE_SAVEFILE_VALIDATE 0x05
+#define STATE_SAVEFILE_EDITOR 0x06
+#define STATE_LEVELSELECT 0x07
+#define STATE_FUNSETTINGS 0xF0
+#define STATE_EXIT 0xFE
 
 #define COIN_1 0x01
 #define COIN_2 0x02

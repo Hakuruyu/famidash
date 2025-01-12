@@ -181,7 +181,7 @@ void state_demo(){
 			(joypad1.press || ((mouse.connected)
 				? mouse.left_press || mouse.right_press
 				: joypad2.press))) {
-					gameState = 0x01; return;
+					gameState = STATE_MENU; return;
 		}
 		ppu_wait_nmi();
 		music_update();
@@ -200,7 +200,7 @@ void state_demo(){
 			(joypad1.press || ((mouse.connected)
 				? mouse.left_press || mouse.right_press
 				: joypad2.press))) {
-				gameState = 0x01; return;
+				gameState = STATE_MENU; return;
 		}
 		
 		ppu_wait_nmi();
@@ -220,7 +220,7 @@ void state_demo(){
 			(joypad1.press || ((mouse.connected)
 				? mouse.left_press || mouse.right_press
 				: joypad2.press))) {
-					gameState = 0x01; return;
+					gameState = STATE_MENU; return;
 		}
 		ppu_wait_nmi();
 		music_update();
@@ -228,7 +228,7 @@ void state_demo(){
 		if (kandoframecnt & 1 && mouse_timer) mouse_timer--;				
 	} while (tmp1 != 0);
 	forced_credits = 0;
-	gameState = 0x01; // validate save file before starting
+	gameState = STATE_MENU;
 	return; 
 	
 }

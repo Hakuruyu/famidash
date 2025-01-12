@@ -329,7 +329,7 @@ char sprite_load_special_behavior(){
 			return 0x10; 
 
 		case LEVEL_END_TRIGGER:
-			gameState = 0x03; 
+			gameState = STATE_LVLDONE; 
 			
 	}
 	return 0;

@@ -242,7 +242,7 @@ void levelselection() {
 
 		if (joypad1.press_b){
 			exitingLevelSelect = 1;
-			kandowatchesyousleep = 0;
+			gameState = STATE_MENU;
 			return;
 		}
 		
@@ -759,8 +759,6 @@ void state_menu() {
 	
 //	set_scroll_x(0);
 //    set_scroll_y(0);
-
-	kandowatchesyousleep = 0;
 
 	if (fullRegion == 1) multi_vram_buffer_horz(palsystem, sizeof(palsystem)-1, NTADR_A(9,7));
 	//mmc3_set_prg_bank_1(GET_BANK(state_menu));
@@ -1284,7 +1282,7 @@ void state_menu() {
 		}
 		if (joypad1.press_select) {
 				tmp2 = 0;
-				gameState = 0;
+				gameState = STATE_DEMO;
 				famistudio_music_stop();
 				music_update();
 				menuMusicCurrentlyPlaying = 0;
@@ -1346,23 +1344,20 @@ void state_menu() {
 	oam_clear();
 	ppu_wait_nmi();
 	tmp7 = newrand() & 255;
-	normalorcommlevels = 1;
+	normalorcommlevels = menuselection;
 	switch (menuselection) {
 		case 0x00:
-			normalorcommlevels = 0;
-			// fall through lmao
 		case 0x01: 
 			POKE(0x2005, 0x00);
 			POKE(0x2005, 0x00);
 			mmc3_disable_irq(); // reset scroll before playing
-			kandowatchesyousleep = 1; 
 			if(!tmp7) crossPRGBankJump8(playPCM, 1); 
 			else crossPRGBankJump8(playPCM, 0);  
 			if (normalorcommlevels) level = LEVEL_COUNT;
 			else level = 0;
-			levelselection(); 
+			gameState = STATE_LEVELSELECT;
 			return;		
-		case 0x02: gameState = 4; return;
+		case 0x02: gameState = STATE_BGMTEST; return;
 		case 0x03: crossPRGBankJump0(settings); return;
 		case 0x04: 
 			if (all_levels_complete != 0xFC) { sfx_play(sfx_invalid, 0); }
@@ -1371,7 +1366,7 @@ void state_menu() {
 				POKE(0x2005, 0x00);
 				mmc3_disable_irq(); // reset scroll before playing
 				last_gameState = gameState;
-				gameState = 0xF0; // fun settings gamestate
+				gameState = STATE_FUNSETTINGS; // fun settings gamestate
 				return;
 			}
 			break;
@@ -1430,7 +1425,7 @@ void start_the_level() {
 		ppu_wait_nmi();
 		music_update();
 	} while (++tmpA < 30);
-	gameState = 0x02;
+	gameState = STATE_GAME;
 	pal_fade_to(4,0);
 	menuMusicCurrentlyPlaying = 0;
 }			
