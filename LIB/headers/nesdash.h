@@ -148,6 +148,11 @@ void increment_attempt_count();
 #define display_attempt_counter(zeroChr, ppu_address) (storeByteToSreg(zeroChr), __AX__ = ppu_address, _display_attempt_counter(__EAX__))
 void _display_attempt_counter (uint32_t args);
 
+/**
+ * @brief Updates currplayer_table_idx from other currplayer variables
+ */
+void _update_currplayer_table_idx();
+
 #define low_word(a) *((uint16_t*)&a)
 #define high_word(a) *((uint16_t*)&a+1)
 
