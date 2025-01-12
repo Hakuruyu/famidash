@@ -1811,10 +1811,9 @@ found_bank:
 			LDA	music_data_locations_hi-FIRST_MUSIC_BANK, Y
 			TAY
 		.endif
-        LDA cpuRegion
-        EOR	#1
-        JSR famistudio_init
-    :
+		LDA cpuRegion
+		JSR famistudio_init
+	:
     PLA
     JSR famistudio_music_play
     
@@ -3174,7 +3173,7 @@ PCM_ptr = ptr1
     ; A = Sample
 	tay
 	ldx	cpuRegion
-	beq :+
+	bne :+
 		clc
 		adc #(SampleRate_PAL-SampleRate_NTSC)
 	:

@@ -762,7 +762,7 @@ void state_menu() {
 
 	kandowatchesyousleep = 0;
 
-	if (framerate) multi_vram_buffer_horz(palsystem, sizeof(palsystem)-1, NTADR_A(9,7));
+	if (fullRegion == 1) multi_vram_buffer_horz(palsystem, sizeof(palsystem)-1, NTADR_A(9,7));
 	//mmc3_set_prg_bank_1(GET_BANK(state_menu));
 
 	if (menuMusicCurrentlyPlaying == 0 && !nestopia) music_play(xbgm_lookup_table[menu_music]);
