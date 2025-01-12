@@ -47,7 +47,7 @@ void main(){
     set_vram_buffer(); // do at least once
 
     // ppu_on_all();
-    // pal_fade_to(4,0);
+    // pal_fade_out();
 
 	
 	// These are done at init time
@@ -61,9 +61,11 @@ void main(){
 	pal_spr(paletteDefaultSP);
 	menuMusicCurrentlyPlaying = 0;
 	crossPRGBankJump0(gameboy_check);
-	
+
+	nmi_fs_updates_on();
+
 	// needed for cc65 to export the label for mesen
-	gameState = 0x05;
+	gameState = STATE_SAVEFILE_VALIDATE;
     while (1){
 		ppu_wait_nmi();
 		switch (gameState){

@@ -158,7 +158,7 @@ void state_demo(){
 	ppu_on_all();
 	ppu_wait_nmi();
 
-	pal_fade_to(0,4);
+	pal_fade_in();
 	tmp1 = 0;
 
 	/*	Incomplete code for reproducing what is being screamed into the Famicom microphone
@@ -184,7 +184,6 @@ void state_demo(){
 					gameState = STATE_MENU; return;
 		}
 		ppu_wait_nmi();
-		music_update();
 		tmp1++;
 		if (kandoframecnt & 1 && mouse_timer) mouse_timer--;	
 	} while (tmp1 != 0);
@@ -195,7 +194,6 @@ void state_demo(){
 		mouse_and_cursor();
 		newrand();
 	    kandoframecnt++;
-		music_update();
 		if (!forced_credits &&
 			(joypad1.press || ((mouse.connected)
 				? mouse.left_press || mouse.right_press
@@ -223,7 +221,6 @@ void state_demo(){
 					gameState = STATE_MENU; return;
 		}
 		ppu_wait_nmi();
-		music_update();
 		tmp1++;
 		if (kandoframecnt & 1 && mouse_timer) mouse_timer--;				
 	} while (tmp1 != 0);
@@ -238,7 +235,7 @@ void state_demo(){
 
 void settings() {
 	settingvalue = 0; 
-	pal_fade_to_withmusic(4,0);
+	pal_fade_out();
 	mmc3_disable_irq();
 	ppu_off();
 	pal_bg(paletteSettings);
@@ -248,10 +245,9 @@ void settings() {
 	mmc3_set_2kb_chr_bank_1(MOUSEBANK);
 	ppu_on_all();
 	one_vram_buffer('c', NTADR_A(4, 7));	// settingvalue is set to 0 beforehand
-	pal_fade_to_withmusic(0,4);
+	pal_fade_in();
 	while (1) {
 		ppu_wait_nmi();
-		music_update();
 		oam_clear();
 		mouse_and_cursor();
 		 // read the first controller

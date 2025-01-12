@@ -413,8 +413,6 @@ uint8_t bigboi;
 uint8_t gravity_mod;
 #endif
 
-uint8_t kandowatchesyousleep;	//variable to say whether to go back to main menu or level select
-
 extern uint16_t min_scroll_y;
 extern uint16_t seam_scroll_y;
 

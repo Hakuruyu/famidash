@@ -164,8 +164,6 @@ void state_lvldone() {
 	while (1) {
 		ppu_wait_nmi();
 		
-		music_update();
-
  		// read the first controller
 
 		kandoframecnt++;
@@ -339,7 +337,7 @@ void state_lvldone() {
 					if (mouse.x >= 0x36 && mouse.x <= 0x53) {
 						sfx_play(sfx_start_level, 0);
 						gameState = STATE_GAME;
-						pal_fade_to_withmusic(4,0);
+						pal_fade_out();
 						memfill(attemptCounter, 0, sizeof(attemptCounter));
 
 						//oam_clear();
@@ -348,8 +346,6 @@ void state_lvldone() {
 					}
 					if (mouse.x >= 0xA6 && mouse.x <= 0xc3) {
 						sfx_play(sfx_exit_level, 0);
-						music_update();
-						gameState = STATE_MENU;
 						menuselection = 0;
 						gameState = STATE_LEVELSELECT;
 						//oam_clear();
@@ -365,7 +361,6 @@ void state_lvldone() {
 				if (menuselection) {
 					
 					sfx_play(sfx_exit_level, 0);
-					music_update();
 					gameState = STATE_LEVELSELECT;
 					menuselection = 0;
 
@@ -376,7 +371,7 @@ void state_lvldone() {
 					
 					sfx_play(sfx_start_level, 0);
 					gameState = STATE_GAME;
-					pal_fade_to_withmusic(4,0);
+					pal_fade_out();
 					memfill(attemptCounter, 0, sizeof(attemptCounter));
 					coins = 0;
 
@@ -711,18 +706,17 @@ void bgmtest() {
   	famistudio_music_stop();
   	music_update();
 	menuMusicCurrentlyPlaying=0;
-	pal_fade_to_withmusic(4,0);
+	pal_fade_out();
 	mmc3_disable_irq();
 	ppu_off();
 	pal_bg(paletteMenu);
 	vram_adr(NAMETABLE_A);
 	vram_unrle(bgmtestscreen);   	
 	ppu_on_all();
-	pal_fade_to_withmusic(0,4);
+	pal_fade_in();
 	while (1) {
 		
 		ppu_wait_nmi();
-		music_update();
 		oam_clear();
 		crossPRGBankJump0(check_if_music_stopped);
 		mouse_and_cursor();
@@ -974,7 +968,7 @@ const unsigned char gameboy_text_size[] = {
 
 void funsettings() {
 	settingvalue = 0; 
-	pal_fade_to_withmusic(4,0);
+	pal_fade_out();
 	ppu_off();
 	pal_bg(paletteMenu);
 	vram_adr(NAMETABLE_A);
@@ -984,10 +978,9 @@ void funsettings() {
 	mmc3_set_2kb_chr_bank_1(MOUSEBANK);
 	ppu_on_all();
 	one_vram_buffer('c', NTADR_A(4, 7));	// settingvalue is set to 0 by default	
-	pal_fade_to_withmusic(0,4);
+	pal_fade_in();
 	while (1) {
 		ppu_wait_nmi();
-		music_update();
 		oam_clear();
 		crossPRGBankJump0(check_if_music_stopped);
 		mouse_and_cursor();

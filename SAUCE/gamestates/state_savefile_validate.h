@@ -28,7 +28,7 @@ void state_savefile_validate(){
 //	mmc3_set_2kb_chr_bank_1(MOUSEBANK);	
 
   //      ppu_on_all();
-   //     pal_fade_to(0,4);
+   //     pal_fade_in();
 
         savefile_reset_check_loop();
     }
@@ -42,7 +42,7 @@ void state_savefile_validate(){
 //	mmc3_set_2kb_chr_bank_1(MOUSEBANK);	
 	
 //        ppu_on_all();
-  //      pal_fade_to(0,4);
+  //      pal_fade_in();
         
         savefile_reset_check_loop();
     }
@@ -56,13 +56,12 @@ void state_savefile_validate(){
         include_nested_dialog_string(dialogBox_saveFileSafetyHeader);
         draw_dialog_box(dialogBox_pleasePressB);
         ppu_on_all();
-        pal_fade_to(0,4);
+        pal_fade_in();
 	mmc3_set_2kb_chr_bank_0(0xFF);	
 	mmc3_set_2kb_chr_bank_1(MOUSEBANK);	
 
         do {
             ppu_wait_nmi();
-	        music_update();
 		    oam_clear();
             mouse_and_cursor();
 		    newrand();
@@ -71,8 +70,7 @@ void state_savefile_validate(){
 		    if (kandoframecnt & 1 && mouse_timer) mouse_timer--;	
         } while (1);
  //   }
-    pal_bright(3);
-    pal_fade_to(3,0);
+    pal_fade_out();
 
     gameState = STATE_DEMO;
     return;
@@ -86,7 +84,7 @@ void state_exit(){
 	mmc3_set_2kb_chr_bank_0(0xFF);	
 	mmc3_set_2kb_chr_bank_1(MOUSEBANK);	
 
-    pal_fade_to(4, 0);
+    pal_fade_out();
     mmc3_disable_irq();
     // Disable SRAM write
 	POKE(0xA001, 0xC0);
@@ -101,7 +99,7 @@ void state_exit(){
     set_scroll_x(0);
     set_scroll_y(0);
     ppu_on_all();
-    pal_fade_to(0, 4);
+    pal_fade_in();
     do {
         ppu_wait_nmi();
 		oam_clear();

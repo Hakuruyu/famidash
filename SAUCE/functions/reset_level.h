@@ -30,7 +30,6 @@ void reset_level() {
 		sfx_play(sfx_death, 0);
 		while (tmp1 != 0){
 			ppu_wait_nmi();
-			music_update();
 			dual == 1 ? oam_clear_two_players() : oam_clear_player();
 			
 			if (robotjumpframe[0] < 20) {
@@ -53,7 +52,6 @@ void reset_level() {
 		sfx_play(sfx_death, 0);
 		while (tmp1 != 0){
 			ppu_wait_nmi();
-			music_update();
 			dual == 1 ? oam_clear_two_players() : oam_clear_player();
 			if (robotjumpframe[0] < 20) {
 				if (!retro_mode) oam_meta_spr(high_byte(player_x[1])-2, high_byte(player_y[1])-2, Explode_Sprites2[robotjumpframe[0] & 0x7F]);
@@ -69,9 +67,8 @@ void reset_level() {
 			--tmp1;
 		}
 	}
-	pal_fade_to_withmusic(4,0);
+	pal_fade_out();
 	oam_clear();
-	++auto_fs_updates;
 	ppu_off(); // reset the level when you get to this point, and change this later
 
 	scroll_y = 0x2EF;
@@ -149,7 +146,7 @@ void reset_level() {
 
 	if (!no_parallax) mmc3_set_1kb_chr_bank_2(parallax_scroll_x + GET_BANK(PARALLAX_CHR));
 	ppu_on_all();
-	pal_fade_to_withmusic(0,4);
+	pal_fade_in();
 	if (!practice_point_count) {
 		music_play(song);
 	}

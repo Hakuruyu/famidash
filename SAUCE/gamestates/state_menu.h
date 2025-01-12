@@ -145,18 +145,20 @@ const uint8_t lvlselect_irq_table[] = {
 void draw_both_progress_bars();
 void levelselection() {
 
+	pal_fade_out();
+	mmc3_disable_irq();
+	ppu_off();
+
 	mmc3_set_8kb_chr(MENUBANK);
 	mmc3_set_2kb_chr_bank_0(0xFF);
 	mmc3_set_2kb_chr_bank_1(MOUSEBANK);
-	pal_fade_to_withmusic(4,0);
-	mmc3_disable_irq();
+
 	disco_sprites = 0;
 
 	write_irq_table(lvlselect_irq_table);
 	set_irq_ptr(irqTable);
 	pal_bg(oldsplashMenu);
 	oam_clear();
-	ppu_off();
 	pal_bright(0);
 	// pal_bg(paletteMenu);
 	set_scroll_x(0);
@@ -196,7 +198,7 @@ void levelselection() {
 	
 	ppu_wait_nmi();
 	ppu_wait_nmi();
-	pal_fade_to_withmusic(0,4);
+	pal_fade_in();
 	
 	while (1){
 		loop_routine_update();
@@ -445,7 +447,7 @@ void updateColors() {
 void customize_screen() {
 #define prev_icon tmp8
 	settingvalue = 3; 
-	pal_fade_to_withmusic(4,0);
+	pal_fade_out();
 	mmc3_disable_irq();
 	ppu_off();
 	pal_bg(paletteMenu);
@@ -488,7 +490,7 @@ void customize_screen() {
 	one_vram_buffer('g', NTADR_A(18, 9));
 	prev_icon = !icon;
 	ppu_on_all();
-	pal_fade_to_withmusic(0,4);
+	pal_fade_in();
 	tmp1 = iconTable[icon] + 'a';
 	one_vram_buffer(tmp1, NTADR_A(15, 8));
 	one_vram_buffer(++tmp1, NTADR_A(16, 8));
@@ -713,10 +715,10 @@ void state_menu() {
 	poweroffcheck = 0xff;
 	if (exitingLevelSelect) {
 		draw_both_progress_bars();
-		pal_fade_to_withmusic(4,0);
+		pal_fade_out();
 		exitingLevelSelect = 0;
 	} else {	
-		pal_fade_to_withmusic(4,0);
+		pal_fade_out();
 	}
 	mmc3_disable_irq();
 
@@ -800,7 +802,7 @@ void state_menu() {
 	speed = 1;
  	ppu_on_all();
 	joypad1.press = 0;
-	pal_fade_to_withmusic(0,4);
+	pal_fade_in();
 	tmp4 = menuselection; ++tmp4;
 	tmp5 = loNTAddrTableTitleScreen[tmp4]|(hiNTAddrTableTitleScreen[tmp4]<<8);
 	one_vram_buffer('a', tmp5);
@@ -1423,10 +1425,9 @@ void start_the_level() {
 		oam_clear();
 		draw_both_progress_bars();
 		ppu_wait_nmi();
-		music_update();
 	} while (++tmpA < 30);
 	gameState = STATE_GAME;
-	pal_fade_to(4,0);
+	pal_fade_out();
 	menuMusicCurrentlyPlaying = 0;
 }			
 
@@ -1504,7 +1505,6 @@ void dec_mouse_timer() {
 void loop_routine_update() {
 	newrand();
 	ppu_wait_nmi();
-	music_update();
 	oam_clear();
 	mouse_and_cursor();
 }		
