@@ -85,6 +85,8 @@ sprite_data = _sprite_data
 	auto_fs_updates:	.res 1
 
 	hexToDecOutputBuffer: .res 5
+
+	instBufWriteBuffer: .res 8	; 2 inst + 2 addr + 1 data + 2 inst + (optionally) 1 length
  
 
 .export _extceil := extceil
@@ -193,36 +195,27 @@ shiftBy4table:
 	; sreg[0] = data
 	; sreg[1] = len
 	horz:
-		pha
+		sta	instBufWriteBuffer+3
 		jsr	set_horz_vbuf_seq
 		bne	common	; = BRA
 
 	vert:
-		pha
+		sta	instBufWriteBuffer+3
 		jsr	set_vert_vbuf_seq
 
 	common:
 		lda	#<(fl_updSeqRepeat-1)
-		sta	INST_BUF+2, y
+		sta	instBufWriteBuffer+5
 		lda	#>(fl_updSeqRepeat-1)
-		sta	INST_BUF+3, y
-		jsr	update_vbuf_inst_ptr
+		sta	instBufWriteBuffer+6
 
-	ldy VRAM_INDEX
-	pla
-	sta VRAM_BUF+1, y
-	txa
-	sta VRAM_BUF+0, y
-	; ptr1 lo byte is len, hi byte is character to repeat
-	lda sreg+1
-	sta VRAM_BUF+2, y
-	lda sreg+0
-	sta VRAM_BUF+3, y
-	tya
-	clc
-	adc #4
-	sta VRAM_INDEX
-	rts
+	stx	instBufWriteBuffer+2	;__	Store addr high byte
+	lda sreg+1					;	Store len
+	sta instBufWriteBuffer+4	;__
+	lda sreg+0					;	Store the byte to repeat
+	sta instBufWriteBuffer+7	;__
+	ldx #8
+	jmp	transferWriteToInstBuf
 .endproc
 .export __one_vram_buffer_horz_repeat := __one_vram_buffer_repeat::horz
 .export __one_vram_buffer_vert_repeat := __one_vram_buffer_repeat::vert
@@ -1672,12 +1665,10 @@ ntAddrHiTbl:
 	total_len = sreg+0
 	len = sreg+1
 
-	LDY VRAM_INDEX
-	STA VRAM_BUF+1, Y	;
-	TXA					;	vram pointer
-	STA VRAM_BUF+0, Y	;__
-	LDA total_len		;	total length
-	STA VRAM_BUF+2, Y	;__
+	STA instBufWriteBuffer+3	;
+	STX	instBufWriteBuffer+2	;__	vram pointer
+	LDA total_len				;	total length
+	STA instBufWriteBuffer+4	;__
 
 	LDX VRAM_INDEX
 
@@ -1692,7 +1683,7 @@ ntAddrHiTbl:
 	LDA #spaceChr
 
 	pad_loop_right:
-		STA VRAM_BUF+3, X
+		STA VRAM_BUF, X
 		INX
 		DEY
 		BNE pad_loop_right
@@ -1703,7 +1694,7 @@ ntAddrHiTbl:
 
 	main_data_loop:
 		LDA (data), Y
-		STA VRAM_BUF+3, X
+		STA VRAM_BUF, X
 		INX
 		DEY
 		BPL main_data_loop
@@ -1714,15 +1705,12 @@ ntAddrHiTbl:
 	LDA #spaceChr
 
 	pad_loop_left:
-		STA VRAM_BUF+3, X
+		STA VRAM_BUF, X
 		INX
 		DEY
 		BNE pad_loop_left
 
 	fin:
-		INX
-		INX
-		INX
 		STX	VRAM_INDEX
 	
 	instBuf:
@@ -1736,10 +1724,11 @@ ntAddrHiTbl:
 .proc endRoutineVbufHorzSeq
 	JSR	set_horz_vbuf_seq
 	LDA	#<(fl_updSeqNormal-1)
-	STA	INST_BUF+2, y
+	STA	instBufWriteBuffer+5
 	LDA	#>(fl_updSeqNormal-1)
-	STA	INST_BUF+3, y
-	JMP	update_vbuf_inst_ptr
+	STA	instBufWriteBuffer+6
+	ldx #7
+	JMP	transferWriteToInstBuf
 .endproc
 
 
@@ -3360,15 +3349,12 @@ SampleRate_PAL:
 	spaceChr = xargs+2
 
 	start:
-		LDY VRAM_INDEX
-		STA VRAM_BUF+1, Y	;
-		TXA					;	VRAM pointer
-		STA VRAM_BUF+0, Y	;__
-		LDA digits			;	Length
-		STA VRAM_BUF+2, Y	;__
+		STA instBufWriteBuffer+3	;
+		STX	instBufWriteBuffer+2	;__	vram pointer
+		LDA digits					;	total length
+		STA instBufWriteBuffer+4	;__
 		CLC					;
 		ADC VRAM_INDEX		;	Update VRAM index
-		ADC #4				;
 		STA	VRAM_INDEX		;__
 
 		LDA value			;
@@ -3672,20 +3658,18 @@ bank:
 	vram_write_header:
 		sty	tmp1
 
-		txa					;
-		ldx	VRAM_INDEX		;
-		sta	VRAM_BUF+0,	x	;	Calculate the vram address of the leftmost digit
-		pla					;	and store in the buffer
-		sec					;
-		sbc	tmp1			;
-		sta	VRAM_BUF+1,	x	;__
-		iny					;
-		tya					;	The amount of bytes needs to be incremented
-		sta	VRAM_BUF+2,	x	;__
+		stx	instBufWriteBuffer+2	;
+		ldx	VRAM_INDEX				;	Calculate the vram address of the leftmost digit
+		pla							;	and store in the buffer
+		sec							;
+		sbc	tmp1					;
+		sta	instBufWriteBuffer+3	;__
+		iny							;
+		tya							;	The amount of bytes needs to be incremented
+		sta	instBufWriteBuffer+4	;__
 
 		clc
 		adc	VRAM_INDEX
-		adc	#4
 		sta	VRAM_INDEX
 		tax
 		dex
@@ -4055,17 +4039,16 @@ vert_skip:
 ; [asm only]
 .segment "CODE"
 
-; Clobbers A, Y
-; Returns: current INST_BUF position in Y, Z flag always clear
+; Clobbers A
+; Returns: Z flag always clear
 .proc set_vbuf_seq
 	; Entrypoint A: horizontal sequence
 	horizontal:
-		ldy	buf_instIdx
 		bit buf_curSeqMode
 		bcc current
 		
 			lda	#<(fl_setSeqHorz-1)
-			sta	INST_BUF+0, y
+			sta	instBufWriteBuffer+0
 			lda	#>(fl_setSeqHorz-1)
 			bcs	common	; = BRA, since we BCC'd earlier
 
@@ -4077,7 +4060,7 @@ vert_skip:
 		bcs current
 	
 			lda	#<(fl_setSeqVert-1)
-			sta	INST_BUF+0, y
+			sta	instBufWriteBuffer+0
 			lda	#>(fl_setSeqVert-1)
 			bcc	common	; = BRA, since we BCC'd earlier
 
@@ -4085,11 +4068,11 @@ vert_skip:
 		ldy	buf_instIdx
 	current:
 		lda	#<(fl_loadAddr-1)
-		sta	INST_BUF+0, y
+		sta	instBufWriteBuffer+0
 		lda	#>(fl_loadAddr-1)
 
 	common:
-		sta	INST_BUF+1, y
+		sta	instBufWriteBuffer+1
 	rts
 
 	::set_horz_vbuf_seq := horizontal
@@ -4101,12 +4084,37 @@ vert_skip:
 ; [asm only]
 .segment "CODE"
 
-.proc update_vbuf_inst_ptr
-	; A: old buf_instIdx
+.proc transferWriteToInstBuf
+	ldy	buf_instIdx
+	.repeat 5, I
+		lda	instBufWriteBuffer+I
+		sta	INST_BUF+I,	y
+	.endrepeat
+	cpx	#7
+	bcc :+
+		lda	instBufWriteBuffer+5
+		sta	INST_BUF+5,	y
+		iny
+		lda	instBufWriteBuffer+6
+		sta	INST_BUF+5,	y
+		iny
+	:
+	cpx #8
+	bcc	:+
+		lda	instBufWriteBuffer+7
+		sta	INST_BUF+5,	y
+		iny
+	:
+	lda	#<(fl_updFinish-1)	;
+	sta	INST_BUF+5, y		;	Ensure the routine ends up exiting
+	lda	#>(fl_updFinish-1)	;
+	sta	INST_BUF+6, y		;__
+
 	tya
 	clc
-	adc	#$04
+	adc	#5
 	sta	buf_instIdx
+
 	rts
 .endproc
 
