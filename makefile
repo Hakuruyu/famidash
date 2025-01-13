@@ -40,13 +40,15 @@ endef
 
 NAME = famidash
 CFG = CONFIG/mmc3.cfg
+SPCDBG_CFG=CONFIG/mmc3_infSpace.cfg
 NSF_CFG=CONFIG/nsf.cfg
 OUTDIR = BUILD
 TMPDIR = TMP
 
-.PHONY: default clean nsf
+.PHONY: default clean nsf spaceDebug
 
 default: $(OUTDIR)/$(NAME).nes
+spaceDebug: $(TMPDIR)/$(NAME)_spaceDebug.bin
 nsf: $(TMPDIR)/$(NAME)_prg.bin $(TMPDIR)/$(NAME)_nsfprg.bin $(TMPDIR)/$(NAME)_meta.bin $(TMPDIR)/$(NAME)_hdr.bin
 
 #target: dependencies
@@ -60,6 +62,10 @@ $(TMPDIR):
 $(OUTDIR)/$(NAME).nes: $(OUTDIR) $(TMPDIR)/$(NAME).o $(TMPDIR)/crt0.o $(CFG)
 	$(LD65) -C $(CFG) -o $(OUTDIR)/$(NAME).nes $(call ld65IncDir,$(TMPDIR)) $(call ld65IncDir,LIB) crt0.o $(NAME).o nes.lib --dbgfile $(OUTDIR)/famidash.dbg
 	@echo $(NAME).nes created
+
+$(TMPDIR)/$(NAME)_spaceDebug.bin: $(OUTDIR) $(TMPDIR)/$(NAME).o $(TMPDIR)/crt0.o $(CFG)
+	$(LD65) -C $(SPCDBG_CFG) -o $(TMPDIR)/$(NAME)_spaceDebug.bin $(call ld65IncDir,$(TMPDIR)) $(call ld65IncDir,LIB) crt0.o $(NAME).o nes.lib --dbgfile $(OUTDIR)/famidash_spaceDebug.dbg
+	@echo $(OUTDIR)/famidash_spaceDebug.dbg created
 
 $(TMPDIR)/crt0.o: GRAPHICS/*.chr LIB/asm/*.s LEVELS/*.s METATILES/*.s METATILES/*.inc MUSIC/EXPORTS/*.s MUSIC/EXPORTS/music_bank*.dmc $(TMPDIR)/BUILD_FLAGS.s $(TMPDIR)/physics_defines.s $(TMPDIR)/space_defines.s
 	$(CA65) LIB/asm/crt0.s -l $(OUTDIR)/crt0.lst --cpu 6502X -g $(call ca65IncDir,.) $(call ca65IncDir,MUSIC/EXPORTS) $(call ca65IncDir,$(TMPDIR)) -o $(TMPDIR)/crt0.o
