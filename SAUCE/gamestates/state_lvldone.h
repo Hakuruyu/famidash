@@ -787,10 +787,10 @@ void bgmtest() {
 		}			
 	__A__ = idx16_load_hi_NOC(xbgmtexts1, song);
 	if (__A__) draw_padded_text(xbgmtexts1[song & 0x7F], xbgmtext1_size[song], 18, NTADR_A(7, 10));
-	else one_vram_buffer_horz_repeat('$', 17, NTADR_A(7, 10));
+	else one_vram_buffer_horz_repeat('$', 18, NTADR_A(7, 10));
 	__A__ = idx16_load_hi_NOC(xbgmtexts2, song);
 	if (__A__) draw_padded_text(xbgmtexts2[song & 0x7F], xbgmtext2_size[song], 18, NTADR_A(7, 11));
-	else one_vram_buffer_horz_repeat('$', 17, NTADR_A(7, 11));
+	else one_vram_buffer_horz_repeat('$', 18, NTADR_A(7, 11));
 	
 	draw_padded_text(sfxtexts[sfx & 0x7F], sfxtexts_size[sfx], 18, NTADR_A(7, 18));
 
