@@ -4,14 +4,15 @@ CODE_BANK_PUSH("XCD_BANK_01")
 void ufo_ship_eject();
 void ship_movement(){
 
-	fallspeed_big = SHIP_MAX_FALLSPEED;
-	fallspeed_mini = MINI_SHIP_MAX_FALLSPEED;
-	gravity_big = SHIP_GRAVITY;
-	gravity_mini = MINI_SHIP_GRAVITY;
+	tmpfallspeed = SHIP_MAX_FALLSPEED(currplayer_table_idx);
+	tmpgravity = SHIP_GRAVITY(currplayer_table_idx);
 	common_gravity_routine();
 
-	if(currplayer_vel_y > (!currplayer_mini ? fallspeed_big : fallspeed_mini)) currplayer_vel_y -= (!mini ? gravity_big : gravity_mini);
-	if(currplayer_vel_y < (!currplayer_mini ? -fallspeed_big : -fallspeed_mini)) currplayer_vel_y += (!mini ? gravity_big : gravity_mini);
+	tmpfallspeed = SHIP_MAX_FALLSPEED(currplayer_table_idx&~TBLIDX_GRAV);
+	tmpgravity = SHIP_GRAVITY(currplayer_table_idx&~TBLIDX_GRAV);
+
+	if(currplayer_vel_y > tmpfallspeed) currplayer_vel_y -= tmpgravity;
+	if(currplayer_vel_y < -tmpfallspeed) currplayer_vel_y += tmpgravity;
 
 
 	Generic.x = high_byte(currplayer_x);
@@ -46,20 +47,7 @@ void ship_movement(){
 	Generic.x = high_byte(currplayer_x); // the rest should be the same
 	
 	if(controllingplayer->a || controllingplayer->up) {
-		if (!currplayer_mini) {
-			if (!currplayer_gravity){
-			    currplayer_vel_y -= SHIP_GRAVITY<<1;
-				} else {
-			    currplayer_vel_y += SHIP_GRAVITY<<1;
-			}
-		}
-		else {
-			if (!currplayer_gravity){
-			    currplayer_vel_y -= MINI_SHIP_GRAVITY<<1;
-				} else {
-			    currplayer_vel_y += MINI_SHIP_GRAVITY<<1;
-			}
-		}
+		currplayer_vel_y = SHIP_GRAVITY(currplayer_table_idx) * 2 + currplayer_vel_y;
 	}	
 }
 

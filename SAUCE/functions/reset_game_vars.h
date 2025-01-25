@@ -30,8 +30,8 @@ void reset_game_vars(){
 	
 	practice_player_1_gravity[tmp1] = player_gravity[0];
 	practice_player_2_gravity[tmp1] = player_gravity[1];
-	practice_player_1_mini[tmp1] = mini[0];
-	practice_player_2_mini[tmp1] = mini[1];
+	practice_player_1_mini[tmp1] = player_mini[0];
+	practice_player_2_mini[tmp1] = player_mini[1];
 	practice_player_1_slope_frames[tmp1] = slope_frames[0];
 	practice_player_2_slope_frames[tmp1] = slope_frames[1];
 	practice_player_1_was_on_slope_counter[tmp1] = was_on_slope_counter[0];
@@ -77,9 +77,9 @@ void restore_practice_state() {
 	player_gravity[1] = practice_player_2_gravity[tmp2];
 	currplayer_gravity = player_gravity[0];
 
-	mini[0] = practice_player_1_mini[tmp2];
-	mini[1] = practice_player_2_mini[tmp2];
-	currplayer_mini = mini[0];
+	player_mini[0] = practice_player_1_mini[tmp2];
+	player_mini[1] = practice_player_2_mini[tmp2];
+	currplayer_mini = player_mini[0];
 
 	slope_frames[0] = practice_player_1_slope_frames[tmp2];
 	slope_frames[1] = practice_player_2_slope_frames[tmp2];

@@ -871,11 +871,11 @@ void state_menu() {
 					break;
 				case 2:		//mini cube
 					title_cube_shit();
-					mini[0] = 1;
+					player_mini[0] = 1;
 					high_byte(player_x[0]) = currplayer_x_small;
 					high_byte(player_y[0]) = currplayer_y_small;
 					crossPRGBankJump0(drawplayerone);
-					mini[0] = 0;
+					player_mini[0] = 0;
 					break;
 				case 3:		//ship
 					title_ship_shit();
@@ -1291,7 +1291,7 @@ void state_menu() {
 				ppu_wait_nmi();
 				return;
 		}
-		low_byte(tmp8) += CUBE_SPEED_X05>>8;
+		low_byte(tmp8) += MSB(CUBE_SPEED_X05(framerate));
 		edit_irq_table(low_byte(tmp8), 2); 
 
 /*
@@ -1380,7 +1380,6 @@ void state_menu() {
 
 void leveldec() {
 	--level;
-	//if (level == 0x0B) level = 0x0A;	//THEORY OF EVERYTHING SKIP
 	low_byte(tmp8) = 0xff;
 	tmp4 = 0;
 	if (!normalorcommlevels) {
@@ -1398,7 +1397,6 @@ void leveldec() {
 
 void levelinc() {
 	++level;
-	//if (level == 0x0B) level = 0x0C;	//THEORY OF EVERYTHING SKIP
 	low_byte(tmp8) = 0xff;
 	tmp4 = 1;
 	if (!normalorcommlevels) {

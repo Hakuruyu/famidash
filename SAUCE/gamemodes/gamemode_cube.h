@@ -16,10 +16,8 @@ void cube_movement(){
 
 
 
-	fallspeed_big = CUBE_MAX_FALLSPEED;
-	fallspeed_mini = MINI_CUBE_MAX_FALLSPEED;
-	gravity_big = CUBE_GRAVITY;
-	gravity_mini = MINI_CUBE_GRAVITY;
+	tmpfallspeed = CUBE_MAX_FALLSPEED(currplayer_table_idx);
+	tmpgravity = CUBE_GRAVITY(currplayer_table_idx);
 	common_gravity_routine();
 
 	Generic.x = high_byte(currplayer_x);
@@ -75,9 +73,7 @@ void cube_movement(){
 				if (!orbed[currplayer]) {
 					jumps++;
 
-					if (!currplayer_mini) currplayer_vel_y = currplayer_gravity ? -JUMP_VEL : JUMP_VEL; // JUMP
-					else currplayer_vel_y = currplayer_gravity ? -MINI_JUMP_VEL : MINI_JUMP_VEL; // JUMP
-
+					currplayer_vel_y = JUMP_VEL(currplayer_table_idx); // JUMP
 
 					if (make_cube_jump_higher) {
 						if ((currplayer_slope_type & SLOPE_DEGREES_MASK) != SLOPE_22DEG) {
@@ -91,8 +87,7 @@ void cube_movement(){
 			else if((controllingplayer->press_a || controllingplayer->press_up) && (jblocked[currplayer] || fblocked[currplayer] || kandokidshack || (gamemode == GAMEMODE_NINJA && ninjajumps[currplayer]))) {		//jblock making you release and press A again to jump
 				jumps++;
 
-				if (!currplayer_mini) currplayer_vel_y = currplayer_gravity ? -JUMP_VEL : JUMP_VEL; // JUMP
-				else currplayer_vel_y = currplayer_gravity ? -MINI_JUMP_VEL : MINI_JUMP_VEL; // JUMP
+				currplayer_vel_y = JUMP_VEL(currplayer_table_idx); // JUMP
 
 				if (make_cube_jump_higher) {
 					if ((currplayer_slope_type & SLOPE_DEGREES_MASK) != SLOPE_22DEG) {
@@ -115,10 +110,9 @@ void cube_movement(){
 			idx8_store(cube_data, currplayer, cube_data[currplayer] & 1);					
 			if((controllingplayer->a || controllingplayer->up) && !orbed[currplayer]) {
 				jumps++;
-				if (!currplayer_mini) currplayer_vel_y = currplayer_gravity ? -ROBOT_JUMP_VEL : ROBOT_JUMP_VEL; // JUMP
-				else currplayer_vel_y = currplayer_gravity ? -MINI_ROBOT_JUMP_VEL : MINI_ROBOT_JUMP_VEL; // JUMP
+				currplayer_vel_y = ROBOT_JUMP_VEL(currplayer_table_idx); // JUMP
 
-				robotjumptime[currplayer] = ROBOT_JUMP_TIME;
+				robotjumptime[currplayer] = ROBOT_JUMP_TIME[framerate];
 				robotjumpframe[0] = 1;
 			}
 		}
@@ -127,28 +121,16 @@ void cube_movement(){
 			idx8_store(cube_data, currplayer, cube_data[currplayer] & 1);		
 			if((controllingplayer->a || controllingplayer->up) && !jblocked[currplayer] && !orbed[currplayer]) {
 				jumps++;
-				if (!currplayer_gravity) {
-					if (!currplayer_mini) currplayer_vel_y = ROBOT_JUMP_VEL; // JUMP
-					else currplayer_vel_y = MINI_ROBOT_JUMP_VEL; // JUMP
-				}
-				else {
-					if (!currplayer_mini) currplayer_vel_y = -ROBOT_JUMP_VEL; // JUMP
-					else currplayer_vel_y = -MINI_ROBOT_JUMP_VEL; // JUMP
-				}
-				robotjumptime[currplayer] = ROBOT_JUMP_TIME;
+				currplayer_vel_y = ROBOT_JUMP_VEL(currplayer_table_idx); // JUMP
+
+				robotjumptime[currplayer] = ROBOT_JUMP_TIME[framerate];
 				robotjumpframe[0] = 1;
 			}
 			else if((controllingplayer->a || controllingplayer->up) && jblocked[currplayer] && !orbed[currplayer]) {	
 				jumps++;
-				if (!currplayer_gravity) {
-					if (!currplayer_mini) currplayer_vel_y = ROBOT_JUMP_VEL; // JUMP
-					else currplayer_vel_y = MINI_ROBOT_JUMP_VEL; // JUMP
-				}
-				else {
-					if (!currplayer_mini) currplayer_vel_y = -ROBOT_JUMP_VEL; // JUMP
-					else currplayer_vel_y = -MINI_ROBOT_JUMP_VEL; // JUMP
-				}
-				robotjumptime[currplayer] = ROBOT_JUMP_TIME;
+				currplayer_vel_y = ROBOT_JUMP_VEL(currplayer_table_idx); // JUMP
+				
+				robotjumptime[currplayer] = ROBOT_JUMP_TIME[framerate];
 				robotjumpframe[0] = 1;
 			}
 		}
@@ -162,27 +144,13 @@ void cube_movement(){
 					jumps++;
 					if (robotjumpframe[0]) robotjumpframe[0]++;
 					if ( robotjumpframe[0] > 3 ) robotjumpframe[0] = 3;
-					if (!currplayer_gravity) {
-						if (!currplayer_mini) currplayer_vel_y = ROBOT_JUMP_VEL; // JUMP
-						else currplayer_vel_y = ROBOT_JUMP_VEL; // JUMP
-					}
-					else {
-						if (!currplayer_mini) currplayer_vel_y = -ROBOT_JUMP_VEL; // JUMP
-						else currplayer_vel_y = -ROBOT_JUMP_VEL; // JUMP
-					}
+					currplayer_vel_y = ROBOT_JUMP_VEL(currplayer_table_idx); // JUMP
 				}	
 				else if((controllingplayer->press_a || controllingplayer->press_up) && jblocked[currplayer] && !orbed[currplayer]) {	
 					jumps++;
 					if (robotjumpframe[0]) robotjumpframe[0]++;
 					if ( robotjumpframe[0] > 3 ) robotjumpframe[0] = 3;
-					if (!currplayer_gravity) {
-						if (!currplayer_mini) currplayer_vel_y = ROBOT_JUMP_VEL; // JUMP
-						else currplayer_vel_y = ROBOT_JUMP_VEL; // JUMP
-					}
-					else {
-						if (!currplayer_mini) currplayer_vel_y = -ROBOT_JUMP_VEL; // JUMP
-						else currplayer_vel_y = -ROBOT_JUMP_VEL; // JUMP
-					}
+					currplayer_vel_y = ROBOT_JUMP_VEL(currplayer_table_idx); // JUMP
 				}
 				else { 
 					robotjumptime[currplayer] = 0; robotjumpframe[0] = 0; 
@@ -202,8 +170,8 @@ void cube_movement(){
 			do {
 				if (!jimsheatballalive[tmp9]) {
 					jimsheatballalive[tmp9] = 1;
-					if (controllingplayer->up) idx16_store_NOC(jimsheatball_vel_y, tmp9, (JIMSHEATBALL_JUMP_VEL / 4) * 7);
-					else idx16_store_NOC(jimsheatball_vel_y, tmp9, JIMSHEATBALL_JUMP_VEL);
+					if (controllingplayer->up) idx16_store_NOC(jimsheatball_vel_y, tmp9, JIMSHEATBALL_JUMP_VEL_d4x7(framerate));
+					else idx16_store_NOC(jimsheatball_vel_y, tmp9, JIMSHEATBALL_JUMP_VEL(framerate));
 					idx16_store_NOC(jimsheatballx, tmp9, high_byte(old_x));
 					idx16_store_hi_NOC(jimsheatbally, tmp9, high_byte(player_y[0]));
 					jimsheatballframe[tmp9] = 0;
@@ -233,9 +201,9 @@ void cube_movement(){
 				currplayer_vel_y = jimsheatball_vel_y[tmp9 & 0x7F];
 				currplayer_gravity = GRAVITY_DOWN;
 
-				if(currplayer_vel_y > JIMSHEATBALL_MAX_FALLSPEED){
-					currplayer_vel_y += -JIMSHEATBALL_GRAVITY;
-				} else currplayer_vel_y += JIMSHEATBALL_GRAVITY;
+				if(currplayer_vel_y > JIMSHEATBALL_MAX_FALLSPEED(framerate)){
+					currplayer_vel_y += -JIMSHEATBALL_GRAVITY(framerate);
+				} else currplayer_vel_y += JIMSHEATBALL_GRAVITY(framerate);
 				currplayer_y += currplayer_vel_y;
 				
 				Generic.x = high_byte(currplayer_x);
@@ -246,7 +214,7 @@ void cube_movement(){
 				if(bg_coll_D()){ // check collision below
 					high_byte(currplayer_y) -= eject_D;
 					low_byte(currplayer_y) = 0;
-					currplayer_vel_y = JIMSHEATBALL_JUMP_VEL;
+					currplayer_vel_y = JIMSHEATBALL_JUMP_VEL(framerate);
 				}
 			}
 				if (cube_data[currplayer] & 1) { idx8_store(cube_data, currplayer, cube_data[currplayer] & 2); }
@@ -270,13 +238,11 @@ void cube_movement(){
 
 void common_gravity_routine() {
 	register int16_t tempvel;
-	register uint8_t temp_gr;
 	if (!dashing[currplayer]) {
-		temp_gr = currplayer_gravity;
-		if(!currplayer_gravity ? ((!currplayer_mini ? fallspeed_big : fallspeed_mini) < currplayer_vel_y) : (-(!currplayer_mini ? fallspeed_big : fallspeed_mini) > currplayer_vel_y)){
-			temp_gr = !temp_gr; 
+		tempvel = tmpgravity;
+		if((!currplayer_gravity ? currplayer_vel_y : -currplayer_vel_y) > tmpfallspeed){
+			tempvel = -tempvel;
 		}
-		tempvel = !currplayer_mini ? (temp_gr ? -gravity_big : gravity_big) : (temp_gr ? -gravity_mini : gravity_mini);
 			switch (gravity_mod) {
 				case 0: break;
 				case 1: tempvel /= 3; break;

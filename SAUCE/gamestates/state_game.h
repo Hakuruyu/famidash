@@ -119,6 +119,7 @@ void state_game(){
 	controllingplayer = &joypad1;
 //	current_transition_timer_length = 0;
 	reset_level();
+	update_currplayer_table_idx();
 
 	END_LEVEL_TIMER = 0;
 	kandoframecnt = 0;
@@ -329,9 +330,6 @@ void state_game(){
 						nmi_fs_updates_on();
 						return;
 					}
-					if ((joypad1.press_right) && DEBUG_MODE) {
-						speed == 4 ? speed = 0 : speed++;
-					}
 					if ((joypad1.press_left) && DEBUG_MODE) {
 						gravity_mod == 4 ? gravity_mod = 0 : gravity_mod++;
 					}
@@ -488,7 +486,7 @@ void state_game(){
 			player_vel_x[0] = currplayer_vel_x;
 			player_vel_y[0] = currplayer_vel_y;
 			player_gravity[0] = currplayer_gravity;
-			mini[0] = currplayer_mini;
+			player_mini[0] = currplayer_mini;
 			slope_frames[0] = currplayer_slope_frames;
 			was_on_slope_counter[0] = currplayer_was_on_slope_counter;
 			slope_type[0] = currplayer_slope_type;
@@ -511,11 +509,12 @@ void state_game(){
 				currplayer_vel_x = player_vel_x[1];
 				currplayer_vel_y = player_vel_y[1];
 				currplayer_gravity = player_gravity[1];
-				currplayer_mini = mini[1];
+				currplayer_mini = player_mini[1];
 				currplayer_slope_frames = slope_frames[1];
 				currplayer_was_on_slope_counter = was_on_slope_counter[1];
 				currplayer_slope_type = slope_type[1];
 				currplayer_last_slope_type = last_slope_type[1];
+				update_currplayer_table_idx();
 			}
 
 			if (controllingplayer->press_right && DEBUG_MODE && !(options & platformer)) invert_gravity(currplayer_gravity);			//DEBUG GRAVITY
@@ -541,7 +540,7 @@ void state_game(){
 			currplayer = 0;					//give back focus
 
 			//if (twoplayer) 
-				controllingplayer = &joypad1;		//give back controls
+			controllingplayer = &joypad1;		//give back controls
 
 			{
 				player_x[1] = currplayer_x;
@@ -549,7 +548,7 @@ void state_game(){
 				player_vel_x[1] = currplayer_vel_x;
 				player_vel_y[1] = currplayer_vel_y;
 				player_gravity[1] = currplayer_gravity;
-				mini[1] = currplayer_mini;
+				player_mini[1] = currplayer_mini;
 				slope_frames[1] = currplayer_slope_frames;
 				was_on_slope_counter[1] = currplayer_was_on_slope_counter;
 				slope_type[1] = currplayer_slope_type;
@@ -560,11 +559,12 @@ void state_game(){
 				currplayer_vel_x = player_vel_x[0];
 				currplayer_vel_y = player_vel_y[0];
 				currplayer_gravity = player_gravity[0];
-				currplayer_mini = mini[0];
+				currplayer_mini = player_mini[0];
 				currplayer_slope_frames = slope_frames[0];
 				currplayer_was_on_slope_counter = was_on_slope_counter[0];
 				currplayer_slope_type = slope_type[0];
 				currplayer_last_slope_type = last_slope_type[0];
+				update_currplayer_table_idx();
 			}
 		}
 
