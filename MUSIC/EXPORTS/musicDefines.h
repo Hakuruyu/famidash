@@ -23,8 +23,8 @@
 #define song_stalemate 22
 #define song_cycles 23
 #define song_blast_processing 24
-#define song_deadlocked 25
-#define song_just_right 26
+#define song_just_right 25
+#define song_ground_to_space 26
 #define song_stereo_madness 27
 #define song_menu_theme 28
 #define song_stereo_madness_2 29
@@ -34,9 +34,10 @@
 #define song_jumper 33
 #define song_xstep 34
 #define song_theory_of_everything 35
-#define song_problematic 36
+#define song_deadlocked 36
 #define song_retray 37
 #define song_cant_let_go 38
 #define song_scheming_weasel 39
-#define song_driving_by_night 40
-#define song_max 41
+#define song_problematic 40
+#define song_driving_by_night 41
+#define song_max 42
